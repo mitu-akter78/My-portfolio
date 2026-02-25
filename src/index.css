@@ -1,51 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400..900;1,400..900&family=Instrument+Serif:ital@0;1&family=Inter:ital,wght@0,100..900;1,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #111111;
+  --color-paper: #f8f9fa;
+  --color-white: #fdfdfd;
+  --color-muted: #888888;
+  --color-border: #222222;
+  --color-border-light: #e2e8f0;
+  --color-glass: rgba(255, 255, 255, 0.05);
+
+  --font-display: 'DM Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'Instrument Serif', serif;
+
+  --color-primary: #6366f1;
+  --color-dark: #131313;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-800: #262626;
+
+  --spacing-container: 1400px;
+  --spacing-container-padding: 2em;
+  --spacing-section-padding: 4em;
+  --spacing-gap: 1.5em;
+
+  --ease-cubic-default: cubic-bezier(0.65, 0.05, 0, 1);
+}
 
 @layer base {
   :root {
-    --ink: #111111;
-    --paper: #f8f9fa;
-    --white: #fdfdfd;
-    --muted: #888888;
-    --border: #222222;
-    --border-light: #e2e8f0;
-    --glass: rgba(255, 255, 255, 0.05);
-
-    --font-display: 'DM Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    --font-serif: 'Instrument Serif', serif;
+    --nav-height: 80px;
+    --nav-height-mobile: 64px;
+    --cubic-default: var(--ease-cubic-default);
   }
 
   body {
     @apply bg-ink text-paper font-body antialiased;
     overflow-x: hidden;
-  }
-
-  /* Noise Overlay */
-  .noise-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 50;
-    opacity: 0.03; /* 3% opacity */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    background-color: #0A0A0A; /* Base dark background */
-  }
-
-  @keyframes float-wave {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }  /* subtle — not dramatic */
-  }
-
-  .letter-wave {
-    animation: float-wave 3s ease-in-out infinite;  /* slow & smooth */
   }
 
   /* Selection styling */
@@ -77,4 +72,349 @@
 
 .lenis.lenis-smooth iframe {
   pointer-events: none;
+}
+
+/* ============================================
+   KINETIC NAVIGATION STYLES
+   ============================================ */
+
+/* ---- SITE HEADER ---- */
+.site-header-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.header {
+  width: 100%;
+  pointer-events: none;
+}
+
+.nav-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-height);
+  pointer-events: none;
+}
+
+.nav-logo {
+  pointer-events: auto;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo-text {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+.nav-row__right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  pointer-events: none;
+}
+
+/* Toggle label — hidden on mobile, shown on larger screens */
+.nav-toggle-label {
+  pointer-events: auto;
+  display: none;
+}
+
+.nav-toggle-label .toggle-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(253, 253, 253, 0.5);
+}
+
+@media (min-width: 768px) {
+  .nav-toggle-label {
+    display: block;
+  }
+}
+
+/* ---- MENU BUTTON ---- */
+.nav-close-btn {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid rgba(253, 253, 253, 0.18);
+  color: var(--white);
+  cursor: pointer;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.nav-close-btn:hover {
+  border-color: rgba(253, 253, 253, 0.5);
+  background: rgba(253, 253, 253, 0.06);
+}
+
+.menu-button-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--white);
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ---- FULLSCREEN MENU CONTAINER ---- */
+.fullscreen-menu-container {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* ---- NAV OVERLAY WRAPPER ---- */
+.nav-overlay-wrapper {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 200;
+  justify-content: flex-end;
+}
+
+.nav-overlay-wrapper[data-nav="open"] {
+  pointer-events: auto;
+}
+
+.nav-overlay-wrapper[data-nav="closed"] {
+  pointer-events: none;
+}
+
+/* ---- OVERLAY (click to close) ---- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* ---- MENU CONTENT (slide-in panel) ---- */
+/* GSAP controls xPercent — no CSS transform here */
+.menu-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #131313;
+}
+
+@media (min-width: 640px) {
+  .menu-content {
+    width: 520px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-content {
+    width: 600px;
+  }
+}
+
+/* ---- BACKDROP LAYERS ---- */
+.menu-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.backdrop-layer {
+  position: absolute;
+  inset: 0;
+  background-color: #131313;
+  transform: translateX(101%);
+}
+
+.backdrop-layer.first {
+  background-color: #1a1a1a;
+}
+
+.backdrop-layer.second {
+  background-color: #161616;
+}
+
+/* ---- MENU CONTENT WRAPPER ---- */
+.menu-content-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 6rem 2.5rem 4rem;
+}
+
+@media (min-width: 640px) {
+  .menu-content-wrapper {
+    padding: 6rem 3rem 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-content-wrapper {
+    padding: 6rem 4rem 4rem;
+  }
+}
+
+/* ---- MENU LIST ---- */
+.menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+/* Borders removed — GSAP handles all nav link hover effects */
+.menu-list-item {
+  position: relative;
+  width: 100%;
+}
+
+/* ---- NAV LINK ---- */
+.nav-link {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  padding: 1rem 0;
+  text-decoration: none;
+
+}
+
+@media (min-width: 640px) {
+  .nav-link {
+    padding: 1.25rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-link {
+    padding: 1.5rem 0;
+  }
+}
+
+.nav-link-text {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 800;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin: 0;
+  line-height: 1;
+  /* No transition — GSAP handles color change via two text layers */
+}
+
+/* Default: hidden off-screen left. GSAP animates xPercent in/out on hover. */
+.nav-link-hover-bg {
+  position: absolute;
+  inset: 0;
+  left: -4rem;
+  right: -4rem;
+  width: auto;
+  height: 100%;
+  background: #f0eeea;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .nav-link-hover-bg {
+    left: -1.5rem;
+    right: -1.5rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .nav-link-hover-bg {
+    left: -3rem;
+    right: -3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-link-hover-bg {
+    left: -4rem;
+    right: -4rem;
+  }
+}
+
+/* ---- NOISE TEXTURE OVERLAY ---- */
+.noise-bg {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.5;
+}
+
+/* ---- RESPONSIVE ADJUSTMENTS ---- */
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 1.25rem;
+  }
+
+  .nav-row {
+    height: var(--nav-height-mobile);
+  }
+
+  .nav-logo-text {
+    font-size: 1.1rem;
+  }
+
+  .nav-close-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nav-link-text {
+    font-size: clamp(1.75rem, 10vw, 2.5rem);
+  }
+
+  .menu-content-wrapper {
+    padding: 5rem 1.5rem 3rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .nav-link-text {
+    font-size: 4rem;
+  }
 }

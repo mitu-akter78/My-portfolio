@@ -1,41 +1,8 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
+import { useRef } from 'react';
+import VariableProximity from './VariableProximity';
 
 const Hero = () => {
-    const containerRef = useRef<HTMLElement>(null);
-
-    const name = "SADIA AKTER";
-    const subtitle = "Creative Developer & Designer";
-    const duration = 1;
-    const total = name.length + subtitle.length;
-    const stagger = duration / total;
-
-    // Pre-build words with correct flat indices — calculated once, used directly
-    const nameWords = name.split(' ').map((word, wi) => {
-        const startIdx = name.split(' ').slice(0, wi).reduce((acc, w) => acc + w.length + 1, 0);
-        return {
-            word,
-            chars: word.split('').map((char, ci) => ({
-                char,
-                index: startIdx + ci  // exact position in full string
-            }))
-        };
-    });
-
-    const subtitleChars = subtitle.split('').map((char, i) => ({
-        char,
-        index: name.length + i  // continues exactly after name
-    }));
-
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo('.hero-content',
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 1.2, ease: 'power4.out' }
-            );
-        }, containerRef);
-        return () => ctx.revert();
-    }, []);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     return (
         <section
@@ -43,49 +10,65 @@ const Hero = () => {
             className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A]"
             id="home"
         >
-            <div className="noise-bg absolute inset-0 mix-blend-overlay"></div>
+            {/* Noise overlay - subtle grain */}
+            <div className="noise-bg absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: '128px 128px',
+                }}
+            />
 
-            <div className="hero-content relative z-10 flex flex-col items-center text-center px-4 max-w-full">
+            {/* Subtle radial glow behind the text */}
+            <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                    background:
+                        'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)',
+                }}
+            />
 
-                {/* Name — rendered directly from pre-built array */}
-                <h1 className="font-display font-black text-white leading-none tracking-[-0.02em] select-none
-                    text-[clamp(2.5rem,7vw,8rem)] flex flex-wrap justify-center gap-x-[0.2em]">
-                    {nameWords.map(({ word, chars }, wi) => (
-                        <span key={wi} className="inline-flex">
-                            {chars.map(({ char, index }) => (
-                                <span
-                                    key={index}
-                                    className="letter-wave inline-block"
-                                    style={{ animationDelay: `-${index * stagger}s` }}
-                                >
-                                    {char}
-                                </span>
-                            ))}
-                        </span>
-                    ))}
+            <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-full">
+                {/* Large Name - Variable Proximity Typography */}
+                <h1 className="leading-none select-none flex flex-wrap justify-center text-white">
+                    <VariableProximity
+                        label="SADIA AKTER"
+                        className="font-black"
+                        fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                        toFontVariationSettings="'wght' 1000, 'opsz' 40"
+                        containerRef={containerRef}
+                        radius={200}
+                        falloff="linear"
+                        style={{
+                            fontSize: 'clamp(3rem, 8vw, 10rem)',
+                            letterSpacing: '-0.03em',
+                            textTransform: 'uppercase',
+                            lineHeight: 1,
+                        }}
+                    />
                 </h1>
 
-                {/* Subtitle — rendered directly from pre-built array */}
-                <div className="mt-3 md:mt-4 flex flex-col items-center">
-                    <p className="font-mono text-[#888] tracking-[0.2em] uppercase text-xs md:text-sm relative py-2 px-4
-                        before:absolute before:left-0 before:top-0 before:w-full before:h-px before:bg-white/10
-                        after:absolute after:left-0 after:bottom-0 after:w-full after:h-px after:bg-white/10
-                        flex flex-wrap justify-center">
-                        {subtitleChars.map(({ char, index }) => (
-                            <span
-                                key={index}
-                                className="letter-wave inline-block"
-                                style={{
-                                    animationDelay: `-${index * stagger}s`,
-                                    whiteSpace: char === ' ' ? 'pre' : 'normal'
-                                }}
-                            >
-                                {char}
-                            </span>
-                        ))}
-                    </p>
+                {/* Subtitle - Variable Proximity Typography */}
+                <div className="mt-1 flex flex-col items-center">
+                    <div className="relative py-3 px-2 before:absolute before:left-0 before:top-0 before:w-full before:h-px before:bg-white/10 after:absolute after:left-0 after:bottom-0 after:w-full after:h-px after:bg-white/10">
+                        <VariableProximity
+                            label="CREATIVE FULL STACK DEVELOPER"
+                            className="font-medium"
+                            fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                            toFontVariationSettings="'wght' 800, 'opsz' 20"
+                            containerRef={containerRef}
+                            radius={100}
+                            falloff="linear"
+                            style={{
+                                color: '#888',
+                                fontSize: 'clamp(0.6rem, 1.1vw, 0.95rem)',
+                                letterSpacing: '0.35em',
+                                fontFamily: "'JetBrains Mono', monospace",
+                                textTransform: 'uppercase'
+                            }}
+                        />
+                    </div>
                 </div>
-
             </div>
         </section>
     );

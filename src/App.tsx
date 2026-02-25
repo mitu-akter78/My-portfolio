@@ -3,7 +3,7 @@ import { ReactLenis } from 'lenis/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import Navigation from './components/Navigation';
+import { Navigation } from './components/ui/sterling-gate-kinetic-navigation';
 import Hero from './components/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
