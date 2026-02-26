@@ -14,7 +14,7 @@ const Hero = () => {
         >
             <div className="absolute inset-0 z-0">  {/* 👈 add it here */}
                 <ColorBends
-                    colors={["#525252","#333333"]}
+                    colors={["#525252", "#333333"]}
                     rotation={0}
                     speed={0.2}
                     scale={1}
@@ -51,14 +51,14 @@ const Hero = () => {
                     <VariableProximity
                         label="SADIA AKTER"
                         className="font-black"
-                        fromFontVariationSettings="'wght' 600, 'opsz' 9"
-                        toFontVariationSettings="'wght' 1000, 'opsz' 40"
+                        fromFontVariationSettings="'wght' 700, 'opsz' 9"
+                        toFontVariationSettings="'wght' 900, 'opsz' 40"
                         containerRef={containerRef}
                         radius={200}
                         falloff="linear"
                         style={{
                             fontSize: 'clamp(2.3rem, 8vw, 10rem)',
-                            letterSpacing: '-0.04em',
+                            letterSpacing: '-0.02em',
                             textTransform: 'uppercase',
                             lineHeight: 1,
                         }}
@@ -66,25 +66,31 @@ const Hero = () => {
                 </h1>
 
                 {/* Subtitle - Variable Proximity Typography */}
-                <div className="mt-1 flex flex-col items-center">
-                    <div className="relative py-0.5 px-0.5 sm:py-1 sm:px-1 before:absolute before:left-0 before:top-0 before:w-full before:h-px before:bg-white/10 after:absolute after:left-0 after:bottom-0 after:w-full after:h-px after:bg-white/10">
-                        <VariableProximity
-                            label="CREATIVE FULL STACK DEVELOPER"
-                            className="font-medium"
-                            fromFontVariationSettings="'wght' 600, 'opsz' 9"
-                            toFontVariationSettings="'wght' 800, 'opsz' 20"
-                            containerRef={containerRef}
-                            radius={100}
-                            falloff="linear"
-                            style={{
-                                color: '#d4cfcf',
-                                fontSize: 'clamp(0.45rem, 1.3vw, 1.3rem)',
-                                letterSpacing: '0.1em',
-                                fontFamily: "'JetBrains Mono', monospace",
-                                textTransform: 'uppercase'
-                            }}
-                        />
-                    </div>
+                <div className="mt-0.4 flex flex-col items-center gap-[5px] sm:gap-[5px]">
+                    {/* Top line */}
+                    <div className="w-full h-[2px] bg-white/30" />
+
+                    <VariableProximity
+                        label="CREATIVE FULL STACK DEVELOPER"
+                        className="font-medium"
+                        fromFontVariationSettings="'wght' 600, 'opsz' 9"
+                        toFontVariationSettings="'wght' 800, 'opsz' 20"
+                        containerRef={containerRef}
+                        radius={100}
+                        falloff="linear"
+                        style={{
+                            color: '#d4cfcf',
+                            fontSize: 'clamp(0.45rem, 1.3vw, 1.3rem)',
+                            letterSpacing: '0.1em',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            textTransform: 'uppercase',
+                            lineHeight: 1,
+                            display: 'block',
+                        }}
+                    />
+
+                    {/* Bottom line */}
+                    <div className="w-full h-[2px] bg-white/30" />
                 </div>
             </div>
         </section>
