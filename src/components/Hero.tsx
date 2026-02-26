@@ -1,5 +1,7 @@
 import { useRef } from 'react';
 import VariableProximity from './VariableProximity';
+import ColorBends from './ui/colorbendbg';
+
 
 const Hero = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -7,9 +9,24 @@ const Hero = () => {
     return (
         <section
             ref={containerRef}
-            className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A]"
+            className="relative h-[52vh] lg:h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A] border-b-5 border-[#FDFDFD]"
             id="home"
         >
+            <div className="absolute inset-0 z-0">  {/* 👈 add it here */}
+                <ColorBends
+                    colors={["#525252","#333333"]}
+                    rotation={0}
+                    speed={0.2}
+                    scale={1}
+                    frequency={1}
+                    warpStrength={1}
+                    mouseInfluence={0}
+                    parallax={0}
+                    noise={0.1}
+                    transparent
+                    autoRotate={0}
+                />
+            </div>
             {/* Noise overlay - subtle grain */}
             <div className="noise-bg absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
                 style={{
@@ -34,14 +51,14 @@ const Hero = () => {
                     <VariableProximity
                         label="SADIA AKTER"
                         className="font-black"
-                        fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                        fromFontVariationSettings="'wght' 600, 'opsz' 9"
                         toFontVariationSettings="'wght' 1000, 'opsz' 40"
                         containerRef={containerRef}
                         radius={200}
                         falloff="linear"
                         style={{
-                            fontSize: 'clamp(3rem, 8vw, 10rem)',
-                            letterSpacing: '-0.03em',
+                            fontSize: 'clamp(2.3rem, 8vw, 10rem)',
+                            letterSpacing: '-0.04em',
                             textTransform: 'uppercase',
                             lineHeight: 1,
                         }}
@@ -50,19 +67,19 @@ const Hero = () => {
 
                 {/* Subtitle - Variable Proximity Typography */}
                 <div className="mt-1 flex flex-col items-center">
-                    <div className="relative py-3 px-2 before:absolute before:left-0 before:top-0 before:w-full before:h-px before:bg-white/10 after:absolute after:left-0 after:bottom-0 after:w-full after:h-px after:bg-white/10">
+                    <div className="relative py-0.5 px-0.5 sm:py-1 sm:px-1 before:absolute before:left-0 before:top-0 before:w-full before:h-px before:bg-white/10 after:absolute after:left-0 after:bottom-0 after:w-full after:h-px after:bg-white/10">
                         <VariableProximity
                             label="CREATIVE FULL STACK DEVELOPER"
                             className="font-medium"
-                            fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                            fromFontVariationSettings="'wght' 600, 'opsz' 9"
                             toFontVariationSettings="'wght' 800, 'opsz' 20"
                             containerRef={containerRef}
                             radius={100}
                             falloff="linear"
                             style={{
-                                color: '#888',
-                                fontSize: 'clamp(0.6rem, 1.1vw, 0.95rem)',
-                                letterSpacing: '0.35em',
+                                color: '#d4cfcf',
+                                fontSize: 'clamp(0.45rem, 1.3vw, 1.3rem)',
+                                letterSpacing: '0.1em',
                                 fontFamily: "'JetBrains Mono', monospace",
                                 textTransform: 'uppercase'
                             }}
