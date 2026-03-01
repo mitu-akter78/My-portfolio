@@ -5,7 +5,7 @@ const Contact = () => {
         <section id="contact" className="py-32 bg-ink text-white relative overflow-hidden">
 
             {/* Abstract Background Elements */}
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/[0.01] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/1 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
 
             <div className="max-w-4xl mx-auto px-6 md:px-12 text-center relative z-10 flex flex-col items-center">
 
@@ -23,7 +23,7 @@ const Contact = () => {
                     href="mailto:hello@example.com"
                     className="group relative inline-flex items-center gap-4 px-10 py-5 bg-white text-ink rounded-full font-medium text-lg overflow-hidden"
                 >
-                    <span className="relative z-10 text-ink group-hover:text-white transition-colors duration-300">Send Me a Message</span>
+                    <span className="relative z-10 text-ink group-hover:text-white transition-colors duration-300">Work With Me</span>
                     <ArrowRight className="relative z-10 text-ink group-hover:text-white group-hover:translate-x-1 transition-all duration-300" size={20} />
 
                     {/* Hover Inversion Background */}

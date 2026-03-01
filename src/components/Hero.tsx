@@ -1,7 +1,7 @@
 import { useRef } from 'react';
-import VariableProximity from './VariableProximity';
+import VariableProximity from './ui/VariableProximity';
 import ColorBends from './ui/colorbendbg';
-
+import { ShimmerButton } from './ui/shimmer-button';
 
 const Hero = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -9,10 +9,10 @@ const Hero = () => {
     return (
         <section
             ref={containerRef}
-            className="relative h-[52vh] lg:h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A] border-b-5 border-[#FDFDFD]"
+            className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A] border-b-1 border-[#2F3030]"
             id="home"
         >
-            <div className="absolute inset-0 z-0">  {/* 👈 add it here */}
+            <div className="absolute inset-0 z-0">
                 <ColorBends
                     colors={["#525252", "#333333"]}
                     rotation={0}
@@ -27,8 +27,10 @@ const Hero = () => {
                     autoRotate={0}
                 />
             </div>
-            {/* Noise overlay - subtle grain */}
-            <div className="noise-bg absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
+
+            {/* Noise overlay */}
+            <div
+                className="noise-bg absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
                 style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")`,
                     backgroundRepeat: 'repeat',
@@ -36,61 +38,71 @@ const Hero = () => {
                 }}
             />
 
-            {/* Subtle radial glow behind the text */}
+            {/* Radial glow */}
             <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                    background:
-                        'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)',
+                    background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)',
                 }}
             />
 
             <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-full">
-                {/* Large Name - Variable Proximity Typography */}
-                <h1 className="leading-none select-none flex flex-wrap justify-center text-white">
+                {/* Name */}
+                <h1 className="leading-none select-none flex flex-wrap justify-center text-white transition-all duration-300 ease-out hover:drop-shadow-[0_2px_14px_rgba(255,255,255,0.15)]">
                     <VariableProximity
                         label="SADIA AKTER"
                         className="font-black"
-                        fromFontVariationSettings="'wght' 700, 'opsz' 9"
+                        fromFontVariationSettings="'wght' 500, 'opsz' 9"
                         toFontVariationSettings="'wght' 900, 'opsz' 40"
                         containerRef={containerRef}
-                        radius={200}
+                        radius={50}
                         falloff="linear"
                         style={{
                             fontSize: 'clamp(2.3rem, 8vw, 10rem)',
-                            letterSpacing: '-0.02em',
+                            letterSpacing: '-0.05em',
                             textTransform: 'uppercase',
                             lineHeight: 1,
+                            
                         }}
                     />
                 </h1>
 
-                {/* Subtitle - Variable Proximity Typography */}
-                <div className="mt-0.4 flex flex-col items-center gap-[5px] sm:gap-[5px]">
-                    {/* Top line */}
-                    <div className="w-full h-[2px] bg-white/30" />
+                {/* Subtitle + CTA */}
+                <div className="mt-0.4 flex flex-col items-center gap-[5px]">
+                    <div className="w-full h-[2px] bg-white/30 " />
 
                     <VariableProximity
                         label="CREATIVE FULL STACK DEVELOPER"
                         className="font-medium"
-                        fromFontVariationSettings="'wght' 600, 'opsz' 9"
-                        toFontVariationSettings="'wght' 800, 'opsz' 20"
+                        fromFontVariationSettings="'wght' 500, 'opsz' 9"
+                        toFontVariationSettings="'wght' 900, 'opsz' 20"
                         containerRef={containerRef}
-                        radius={100}
+                        radius={50}
                         falloff="linear"
                         style={{
-                            color: '#d4cfcf',
+                            color: '#f5f2f2',
                             fontSize: 'clamp(0.45rem, 1.3vw, 1.3rem)',
                             letterSpacing: '0.1em',
-                            fontFamily: "'JetBrains Mono', monospace",
+                            fontFamily: "'Playfair Display', Georgia, serif",
                             textTransform: 'uppercase',
                             lineHeight: 1,
                             display: 'block',
                         }}
                     />
 
-                    {/* Bottom line */}
                     <div className="w-full h-[2px] bg-white/30" />
+
+                    {/* CTA */}
+                    <ShimmerButton
+                        className="mt-12 shadow-2xl"
+                        shimmerColor="#ffffff"
+                        background="rgba(10, 10, 10, 1)"
+                        onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                        <span className="whitespace-pre-wrap text-center text-base font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+                            Hire Me
+                        </span>
+                    </ShimmerButton>
                 </div>
             </div>
         </section>

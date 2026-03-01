@@ -31,16 +31,51 @@
   --ease-cubic-default: cubic-bezier(0.65, 0.05, 0, 1);
 }
 
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0deg);
+  }
+
+  15%,
+  35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+
+  65%,
+  85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+
+@utility animate-shimmer-slide {
+  animation: shimmer-slide var(--speed) ease-in-out infinite alternate;
+}
+
+@utility animate-spin-around {
+  animation: spin-around calc(var(--speed) * 2) infinite linear;
+}
+
 @layer base {
   :root {
     --nav-height: 80px;
-    --nav-height-mobile: 68px; /* was 64px — a touch taller on mobile */
+    --nav-height-mobile: 68px;
     --cubic-default: var(--ease-cubic-default);
   }
 
   body {
     @apply bg-ink text-paper font-body antialiased;
     overflow-x: clip;
+    cursor: none;
   }
 
   ::selection {
@@ -57,10 +92,21 @@
   }
 }
 
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-.lenis.lenis-smooth iframe { pointer-events: none; }
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
 
 /* ============================================
    KINETIC NAVIGATION STYLES
@@ -102,7 +148,6 @@
   align-items: center;
 }
 
-/* ↑ Slightly larger logo: 1.25rem → 1.45rem */
 .nav-logo-text {
   font-family: var(--font-display);
   font-size: 1.45rem;
@@ -119,7 +164,6 @@
 }
 
 /* ---- MENU BUTTON ---- */
-/* ↑ Slightly larger button: 42px → 48px, icon: 22px → 25px */
 .nav-close-btn {
   pointer-events: auto;
   display: flex;
@@ -165,8 +209,13 @@
   justify-content: flex-end;
 }
 
-.nav-overlay-wrapper[data-nav="open"] { pointer-events: auto; }
-.nav-overlay-wrapper[data-nav="closed"] { pointer-events: none; }
+.nav-overlay-wrapper[data-nav="open"] {
+  pointer-events: auto;
+}
+
+.nav-overlay-wrapper[data-nav="closed"] {
+  pointer-events: none;
+}
 
 .overlay {
   position: absolute;
@@ -193,11 +242,15 @@
 }
 
 @media (min-width: 640px) {
-  .menu-content { width: 480px; }
+  .menu-content {
+    width: 480px;
+  }
 }
 
 @media (min-width: 1024px) {
-  .menu-content { width: 520px; }
+  .menu-content {
+    width: 520px;
+  }
 }
 
 /* ---- BACKDROP LAYERS ---- */
@@ -214,8 +267,13 @@
   transform: translateX(101%);
 }
 
-.backdrop-layer.first  { background-color: #1a1a1a; }
-.backdrop-layer.second { background-color: #161616; }
+.backdrop-layer.first {
+  background-color: #1a1a1a;
+}
+
+.backdrop-layer.second {
+  background-color: #161616;
+}
 
 /* ---- MENU CONTENT WRAPPER ---- */
 .menu-content-wrapper {
@@ -299,7 +357,7 @@
   text-decoration: none;
 }
 
-/* ---- TEXT WRAPPER: clip overflow for char animation ---- */
+/* ---- TEXT WRAPPER ---- */
 .nav-link-text-wrapper {
   position: relative;
   overflow: hidden;
@@ -308,36 +366,31 @@
   white-space: nowrap;
 }
 
-/* Active (default visible) chars */
-.nav-link-active {
+.nav-link-active,
+.nav-link-hidden {
   display: block;
-  pointer-events: none;
-  color: rgba(253, 253, 253, 0.92);
+  /* keep existing layout behavior */
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 5.5vw, 2.8rem);
   font-weight: 800;
-  font-style: italic;
+  
   text-transform: uppercase;
   letter-spacing: -0.025em;
   line-height: 1;
+  pointer-events: none;
+}
+
+.nav-link-active {
+  color: rgba(253, 253, 253, 0.92);
   transition: color 0.3s ease;
 }
 
-/* Hidden chars (revealed on hover) */
 .nav-link-hidden {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  pointer-events: none;
-  color: rgba(253, 253, 253, 0.35);
-  font-family: var(--font-display);
-  font-size: clamp(2.2rem, 5.5vw, 2.8rem);
-  font-weight: 800;
-  font-style: italic;
-  text-transform: uppercase;
-  letter-spacing: -0.025em;
-  line-height: 1;
+  color: rgba(255, 255, 255, 0.726)
 }
 
 .nav-link-text-wrapper .char {
@@ -345,13 +398,16 @@
   will-change: transform, opacity;
 }
 
-/* Active / current page: dim BOTH text layers so hover stays muted too */
 .menu-list-item.is-active .nav-link-active {
   color: rgba(253, 253, 253, 0.28);
+  font-weight: 600;
+   font-style: italic;
 }
 
 .menu-list-item.is-active .nav-link-hidden {
   color: rgba(253, 253, 253, 0.28);
+   font-weight: 600;
+   font-style: italic;
 }
 
 /* ---- BOTTOM FOOTER AREA ---- */
@@ -413,47 +469,38 @@
 }
 
 /* ---- RESPONSIVE ---- */
-
-/* Mobile: more padding, larger tap targets, better spacing */
 @media (max-width: 480px) {
   .nav-container {
-    /* More horizontal padding so logo & button aren't crammed to the edges */
     padding: 0 1.5rem;
   }
 
   .nav-row {
-    height: var(--nav-height-mobile); /* 68px — uses the updated variable */
+    height: var(--nav-height-mobile);
   }
 
-  /* ↑ Logo: 1.1rem → 1.3rem on mobile */
   .nav-logo-text {
     font-size: 1.3rem;
   }
 
-  /* ↑ Button: 36px → 42px on mobile — still a comfortable tap target */
   .nav-close-btn {
     width: 42px;
     height: 42px;
   }
 
-  /* Icon matches button growth */
   .menu-button-icon {
     width: 22px;
     height: 22px;
   }
 
-  /* Slightly tighter menu padding on small screens */
   .menu-content-wrapper {
     padding: 5rem 1.5rem 6rem;
   }
 
-  /* Menu links: scale down just a touch so they fit without scrolling */
   .nav-link-active,
   .nav-link-hidden {
     font-size: clamp(1.9rem, 10vw, 2.4rem);
   }
 
-  /* Social links row: tighter gap so they don't overflow */
   .menu-social-links {
     gap: 1.25rem;
     flex-wrap: wrap;
@@ -462,6 +509,7 @@
 }
 
 @media (min-width: 1400px) {
+
   .nav-link-active,
   .nav-link-hidden {
     font-size: 3.2rem;

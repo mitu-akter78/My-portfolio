@@ -10,6 +10,7 @@ import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import { Cursor } from './components/ui/inverted-cursor';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,8 +22,13 @@ function App() {
   return (
     <ReactLenis root>
       <div className="relative min-h-screen selection:bg-white/20 selection:text-white">
+        
+        
         {/* Global Noise Overlay */}
         <div className="noise-bg pointer-events-none fixed inset-0 z-50 mix-blend-overlay"></div>
+
+        {/* Global Custom Cursor */}
+        <Cursor />
 
         <Navigation />
 
