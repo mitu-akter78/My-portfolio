@@ -14,7 +14,7 @@ const Hero = () => {
         >
             <div className="absolute inset-0 z-0">
                 <ColorBends
-                    colors={["#525252", "#333333"]}
+                    colors={["#525252", "#786d6f"]}
                     rotation={0}
                     speed={0.2}
                     scale={1}
@@ -28,15 +28,6 @@ const Hero = () => {
                 />
             </div>
 
-            {/* Noise overlay */}
-            <div
-                className="noise-bg absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
-                style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'repeat',
-                    backgroundSize: '128px 128px',
-                }}
-            />
 
             {/* Radial glow */}
             <div
@@ -48,7 +39,7 @@ const Hero = () => {
 
             <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-full">
                 {/* Name */}
-                <h1 className="leading-none select-none flex flex-wrap justify-center text-white transition-all duration-300 ease-out hover:drop-shadow-[0_2px_14px_rgba(255,255,255,0.15)]">
+                <h1 className="leading-none select-none flex flex-wrap justify-center text-[#fcf5f6] transition-all duration-300 ease-out hover:drop-shadow-[0_2px_14px_rgba(255,255,255,0.15)]">
                     <VariableProximity
                         label="SADIA AKTER"
                         className="font-black"
@@ -69,18 +60,18 @@ const Hero = () => {
 
                 {/* Subtitle + CTA */}
                 <div className="mt-0.4 flex flex-col items-center gap-[5px]">
-                    <div className="w-full h-[2px] bg-white/30 " />
+                    <div className="w-full h-[2px] bg-[#fcf5f6] " />
 
                     <VariableProximity
                         label="CREATIVE FULL STACK DEVELOPER"
                         className="font-medium"
-                        fromFontVariationSettings="'wght' 500, 'opsz' 9"
+                        fromFontVariationSettings="'wght' 600, 'opsz' 9"
                         toFontVariationSettings="'wght' 900, 'opsz' 20"
                         containerRef={containerRef}
                         radius={50}
                         falloff="linear"
                         style={{
-                            color: '#f5f2f2',
+                            color: '#c4586f',
                             fontSize: 'clamp(0.45rem, 1.3vw, 1.3rem)',
                             letterSpacing: '0.1em',
                             fontFamily: "'Playfair Display', Georgia, serif",
@@ -90,7 +81,7 @@ const Hero = () => {
                         }}
                     />
 
-                    <div className="w-full h-[2px] bg-white/30" />
+                    <div className="w-full h-[2px] bg-[#fcf5f6]" />
 
                     {/* CTA */}
                     <ShimmerButton
@@ -99,7 +90,7 @@ const Hero = () => {
                         background="rgba(10, 10, 10, 1)"
                         onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                     >
-                        <span className="whitespace-pre-wrap text-center text-base font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+                        <span className="whitespace-pre-wrap text-center text-base font-medium leading-none tracking-tight text-[#fcf5f6] dark:from-white dark:to-slate-900/10 lg:text-lg">
                             Hire Me
                         </span>
                     </ShimmerButton>

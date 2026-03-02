@@ -77,7 +77,18 @@ function Character() {
 export default function About() {
    const sectionRef = useRef<HTMLElement>(null);
   return (
-    <section ref={sectionRef}  className="relative w-full min-h-screen bg-[#0A0A0A] flex items-center justify-center overflow-x-clip font-sans">
+    <section 
+      ref={sectionRef}
+      className="relative w-full min-h-screen bg-[#0A0A0A] flex items-center justify-center overflow-x-clip font-sans">
+
+      {/* Subtle background texture */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+          backgroundSize: '32px 32px',
+        }}
+      />
 
       {/* Background watermark — THIS is where the 3D reveal effect lives */}
       <div
@@ -103,8 +114,8 @@ export default function About() {
           {/* Card — exactly as you had it, MagicText untouched */}
           <div className="bg-[#F2F0EB] rounded-xl p-8 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
             <div className="float-left w-[72px] h-[56px] md:w-[80px] md:h-[64px] [shape-outside:circle(50%_at_0%_0%)]" />
-            <div className="text-[#1C1C1C] text-[15px] md:text-base leading-[1.7]">
-              <MagicText text="  Hi there! I'm [Name], a developer passionate about building clean, performant, and user-friendly applications. I specialize in turning complex problems into elegant digital solutions. <br/> <br/> I work across the full stack — crafting responsive frontends with React and Next.js, building robust backends with Node.js and databases, and deploying scalable apps to the cloud. I care deeply about code quality, developer experience, and writing software that's as readable as it is functional." />
+            <div className="text-[#5c1d2a] text-[15px] md:text-base leading-[1.7]">
+              <MagicText text="  Hi there! I'm Sadia, a full stack developer from bangladesh. Passionate about building clean, performant, and user-friendly applications. I specialize in turning complex problems into elegant digital solutions. <br/> <br/> I work across the full stack — crafting responsive frontends with React and Next.js, building robust backends with Node.js and databases, and deploying scalable apps to the cloud. I care deeply about code quality, developer experience, and writing software that's as readable as it is functional." />
             </div>
           </div>
         </motion.div>

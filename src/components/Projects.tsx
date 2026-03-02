@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 const PROJECTS = [
     {
@@ -51,6 +51,8 @@ const PROJECTS = [
     },
 ];
 
+/* ─── PREMIUM PROJECT CARD ──────────────────────────────────────────────── */
+
 const ProjectCard = ({ project }: { project: typeof PROJECTS[0] }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [currentImageIdx, setCurrentImageIdx] = useState(0);
@@ -60,7 +62,7 @@ const ProjectCard = ({ project }: { project: typeof PROJECTS[0] }) => {
         setCurrentImageIdx(0);
         intervalRef.current = setInterval(() => {
             setCurrentImageIdx(prev => (prev + 1) % project.images.length);
-        }, 400);
+        }, 500);
     }, [project.images.length]);
 
     const stopCycling = useCallback(() => {
@@ -71,96 +73,165 @@ const ProjectCard = ({ project }: { project: typeof PROJECTS[0] }) => {
         setCurrentImageIdx(0);
     }, []);
 
-    useEffect(() => {
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-        };
+    useEffect(() => () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
     }, []);
 
     return (
-        <div
-            className="project-card"
-            onMouseEnter={() => { setIsHovered(true); startCycling(); }}
-            onMouseLeave={() => { setIsHovered(false); stopCycling(); }}
-            style={{
-                position: 'relative',
-                cursor: 'pointer',
-                overflow: 'hidden',
-                aspectRatio: '16/10',
-                background: '#111',
-            }}
-        >
-            {/* Images */}
-            {project.images.map((src, i) => (
-                <img
-                    key={src}
-                    src={src}
-                    alt={project.title}
-                    style={{
-                        position: 'absolute',
-                        inset: 0,
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        opacity: isHovered && i === currentImageIdx ? 1 : 0,
-                        transition: 'opacity 0.12s ease',
-                        filter: 'grayscale(100%) brightness(0.7)',
-                    }}
-                />
-            ))}
+        <>
+            <style>{`
+                .pc-root {
+                    position: relative;
+                    cursor: pointer;
+                    aspect-ratio: 16/10;
+                    background: #090909;
+                    overflow: hidden;
+                    transition: border-color 0.4s ease;
+                }
+                .pc-root:hover {
+                    border-color: #303030 !important;
+                }
 
-            {/* Overlay gradient */}
-            <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)',
-                zIndex: 2,
-                opacity: isHovered ? 1 : 0,
-                transition: 'opacity 0.4s ease',
-            }} />
+                /* The image wrapper — full at rest, shrinks inward on hover */
+                .pc-img-wrapper {
+                    position: absolute;
+                    overflow: hidden;
+                    transition: inset 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+                    inset: 0px;
+                    z-index: 1;
+                }
+                .pc-root:hover .pc-img-wrapper {
+                    inset: 20px;
+                }
 
-            {/* Default state: subtle grid texture */}
-            <div style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)',
-                backgroundSize: '28px 28px',
-                opacity: isHovered ? 0 : 0.3,
-                transition: 'opacity 0.4s ease',
-            }} />
+                .pc-img-wrapper img {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    filter: grayscale(100%) brightness(0.72) contrast(1.05);
+                    display: block;
+                }
 
-            {/* Year tag */}
-            <span style={{
-                position: 'absolute',
-                top: 16,
-                right: 16,
-                fontFamily: "'Courier New', monospace",
-                fontSize: '11px',
-                color: '#888',
-                letterSpacing: '0.15em',
-                zIndex: 3,
-                opacity: isHovered ? 1 : 0.5,
-                transition: 'opacity 0.3s',
-            }}>{project.year}</span>
+                /* Bottom scrim inside wrapper */
+                .pc-scrim {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 55%);
+                    z-index: 2;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.4s ease;
+                }
+                .pc-root:hover .pc-scrim { opacity: 1; }
 
-            {/* Number */}
-            <span style={{
-                position: 'absolute',
-                top: 16,
-                left: 16,
-                fontFamily: "'Courier New', monospace",
-                fontSize: '11px',
-                color: '#555',
-                letterSpacing: '0.1em',
-                zIndex: 3,
-            }}>{project.num}</span>
-        </div>
+                /* Corner brackets at card edges */
+                .pc-corner {
+                    position: absolute;
+                    width: 13px;
+                    height: 13px;
+                    z-index: 6;
+                    opacity: 0;
+                    transition: opacity 0.35s ease;
+                    pointer-events: none;
+                }
+                .pc-root:hover .pc-corner { opacity: 1; }
+                .pc-corner--tl { top: 7px;    left: 7px;    border-top: 1px solid rgba(255,255,255,0.4); border-left: 1px solid rgba(255,255,255,0.4); }
+                .pc-corner--tr { top: 7px;    right: 7px;   border-top: 1px solid rgba(255,255,255,0.4); border-right: 1px solid rgba(255,255,255,0.4); }
+                .pc-corner--bl { bottom: 7px; left: 7px;    border-bottom: 1px solid rgba(255,255,255,0.4); border-left: 1px solid rgba(255,255,255,0.4); }
+                .pc-corner--br { bottom: 7px; right: 7px;   border-bottom: 1px solid rgba(255,255,255,0.4); border-right: 1px solid rgba(255,255,255,0.4); }
+
+                /* Progress dots */
+                .pc-dots {
+                    position: absolute;
+                    bottom: 9px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    display: flex;
+                    gap: 5px;
+                    z-index: 7;
+                    opacity: 0;
+                    transition: opacity 0.3s ease 0.15s;
+                    pointer-events: none;
+                }
+                .pc-root:hover .pc-dots { opacity: 1; }
+                .pc-dot {
+                    width: 4px;
+                    height: 4px;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.2);
+                    transition: background 0.2s ease, transform 0.2s ease;
+                }
+                .pc-dot--active {
+                    background: rgba(255,255,255,0.85);
+                    transform: scale(1.35);
+                }
+
+                /* Number + year tags */
+                .pc-num, .pc-year {
+                    position: absolute;
+                    font-family: 'Space Mono', monospace;
+                    font-size: 10px;
+                    letter-spacing: 0.12em;
+                    z-index: 8;
+                    pointer-events: none;
+                    transition: color 0.3s ease;
+                }
+                .pc-num  { top: 13px; left: 15px; }
+                .pc-year { top: 13px; right: 15px; letter-spacing: 0.15em; }
+            `}</style>
+
+            <div
+                className="pc-root project-card"
+                onMouseEnter={() => { setIsHovered(true); startCycling(); }}
+                onMouseLeave={() => { setIsHovered(false); stopCycling(); }}
+            >
+                {/* ── Image wrapper: full at rest → shrinks on hover ── */}
+                <div className="pc-img-wrapper">
+                    {project.images.map((src, i) => (
+                        <img
+                            key={src}
+                            src={src}
+                            alt={project.title}
+                            style={{
+                                opacity: isHovered
+                                    ? (i === currentImageIdx ? 1 : 0)
+                                    : (i === 0 ? 1 : 0),
+                                transition: 'opacity 0.2s ease',
+                            }}
+                        />
+                    ))}
+                    <div className="pc-scrim" />
+                </div>
+
+                {/* ── Corner brackets ── */}
+                <div className="pc-corner pc-corner--tl" />
+                <div className="pc-corner pc-corner--tr" />
+                <div className="pc-corner pc-corner--bl" />
+                <div className="pc-corner pc-corner--br" />
+
+                {/* ── Tags ── */}
+                <span className="pc-num"  style={{ color: isHovered ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)' }}>{project.num}</span>
+                <span className="pc-year" style={{ color: isHovered ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.18)' }}>{project.year}</span>
+
+                {/* ── Cycle progress dots ── */}
+                <div className="pc-dots">
+                    {project.images.map((_, i) => (
+                        <div
+                            key={i}
+                            className={`pc-dot${isHovered && i === currentImageIdx ? ' pc-dot--active' : ''}`}
+                        />
+                    ))}
+                </div>
+            </div>
+        </>
     );
 };
 
-const Projects = () => {
-    const [ctaHovered, setCtaHovered] = useState(false);
+/* ─── REST IS IDENTICAL ─────────────────────────────────────────────────── */
 
+const Projects = () => {
     return (
         <>
             <style>{`
@@ -173,7 +244,7 @@ const Projects = () => {
                 }
 
                 #projects-section {
-                    background: #0a0a0a;
+                    background: #0A0A0A;
                     min-height: 100vh;
                     padding: 80px 48px;
                     font-family: 'Space Mono', monospace;
@@ -189,17 +260,17 @@ const Projects = () => {
                 }
 
                 .projects-title {
-                    font-Family: 'Playfair Display', Georgia, serif;
+                    font-family: 'Playfair Display', Georgia, serif;
                     font-size: clamp(48px, 7vw, 88px);
                     letter-spacing: -0.05em;
-                    color: #fff;
+                    color: #fcf5f6;
                     line-height: 1;
                 }
 
                 .projects-title em {
                     font-family: 'Libre Baskerville', serif;
                     font-style: italic;
-                    color: #888;
+                    color: #A93D54;
                     font-size: 0.65em;
                 }
 
@@ -251,10 +322,6 @@ const Projects = () => {
                     border: 1px solid #1a1a1a;
                 }
 
-                .project-card:hover {
-                    border-color: #333;
-                }
-
                 /* CTA */
                 .cta-section {
                     margin-top: 80px;
@@ -265,7 +332,7 @@ const Projects = () => {
                 .cta-wrapper {
                     border-top: 1px dashed #2a2a2a;
                     border-bottom: 1px dashed #2a2a2a;
-                    padding: 28px 0;
+                    padding: 20px 0;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -291,7 +358,7 @@ const Projects = () => {
 
                 .cta-text {
                     font-family: 'Bebas Neue', sans-serif;
-                    font-size: clamp(22px, 3vw, 36px);
+                    font-size: clamp(22px, 2vw, 36px);
                     letter-spacing: 0.2em;
                     color: #e8e8e8;
                     position: relative;
@@ -322,6 +389,14 @@ const Projects = () => {
             `}</style>
 
             <section id="projects-section">
+                <div
+                    className="absolute inset-0 pointer-events-none opacity-[0.02]"
+                    style={{
+                        backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+                        backgroundSize: '32px 32px',
+                    }}
+                />
+
                 {/* Header */}
                 <div className="projects-header">
                     <h2 className="projects-title">
@@ -352,10 +427,10 @@ const Projects = () => {
                         </span>
                     </div>
                 </div>
-                {/* Google Fonts import via style tag */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
-      `}</style>
+
+                <style>{`
+                    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+                `}</style>
             </section>
         </>
     );
