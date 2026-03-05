@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 const PROJECTS = [
     {
@@ -212,7 +212,7 @@ const ProjectCard = ({ project }: { project: typeof PROJECTS[0] }) => {
                 <div className="pc-corner pc-corner--br" />
 
                 {/* ── Tags ── */}
-                <span className="pc-num"  style={{ color: isHovered ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)' }}>{project.num}</span>
+                <span className="pc-num" style={{ color: isHovered ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)' }}>{project.num}</span>
                 <span className="pc-year" style={{ color: isHovered ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.18)' }}>{project.year}</span>
 
                 {/* ── Cycle progress dots ── */}
@@ -261,16 +261,17 @@ const Projects = () => {
 
                 .projects-title {
                     font-family: 'Playfair Display', Georgia, serif;
-                    font-size: clamp(48px, 7vw, 88px);
+                    font-size: clamp(32px, 7vw, 88px);
                     letter-spacing: -0.05em;
                     color: #fcf5f6;
                     line-height: 1;
+                    word-break: break-word;
                 }
 
                 .projects-title em {
                     font-family: 'Libre Baskerville', serif;
                     font-style: italic;
-                    color: #A93D54;
+                    color: rgba(242,240,235,0.55);
                     font-size: 0.65em;
                 }
 
@@ -278,7 +279,7 @@ const Projects = () => {
                     font-family: 'Space Mono', monospace;
                     font-size: 11px;
                     letter-spacing: 0.2em;
-                    color: #444;
+                    color: rgba(242,240,235,0.3);
                     text-transform: uppercase;
                 }
 
@@ -307,14 +308,14 @@ const Projects = () => {
                     font-family: 'Bebas Neue', sans-serif;
                     font-size: clamp(22px, 2.5vw, 32px);
                     letter-spacing: 0.06em;
-                    color: #e8e8e8;
+                    color: #F2F0EB;
                 }
 
                 .project-category {
                     font-family: 'Space Mono', monospace;
                     font-size: 10px;
                     letter-spacing: 0.15em;
-                    color: #444;
+                    color: rgba(242,240,235,0.3);
                     text-transform: uppercase;
                 }
 
@@ -370,7 +371,7 @@ const Projects = () => {
                 }
 
                 .cta-wrapper:hover .cta-text {
-                    color: #0a0a0a;
+                    color: #0A0A0A;
                 }
 
                 .cta-arrow {
@@ -385,10 +386,15 @@ const Projects = () => {
                 @media (max-width: 768px) {
                     #projects-section { padding: 48px 20px; }
                     .projects-grid { grid-template-columns: 1fr; }
+                    .projects-header { 
+                        flex-direction: column; 
+                        align-items: flex-start; 
+                        gap: 16px; 
+                    }
                 }
             `}</style>
 
-            <section id="projects-section">
+            <section id="projects-section" style={{ position: 'relative', overflowX: 'clip' }}>
                 <div
                     className="absolute inset-0 pointer-events-none opacity-[0.02]"
                     style={{

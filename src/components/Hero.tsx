@@ -39,7 +39,7 @@ const Hero = () => {
 
             <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-full">
                 {/* Name */}
-                <h1 className="leading-none select-none flex flex-wrap justify-center text-[#fcf5f6] transition-all duration-300 ease-out hover:drop-shadow-[0_2px_14px_rgba(255,255,255,0.15)]">
+                <h1 className="leading-none select-none flex flex-wrap justify-center text-[#F3F1EC] transition-all duration-300 ease-out hover:drop-shadow-[#AA3E56]">
                     <VariableProximity
                         label="SADIA AKTER"
                         className="font-black"
@@ -60,18 +60,18 @@ const Hero = () => {
 
                 {/* Subtitle + CTA */}
                 <div className="mt-0.4 flex flex-col items-center gap-[5px]">
-                    <div className="w-full h-[2px] bg-[#fcf5f6] " />
+                    <div className="w-full h-[2px] bg-[#F3F1EC] " />
 
                     <VariableProximity
                         label="CREATIVE FULL STACK DEVELOPER"
                         className="font-medium"
-                        fromFontVariationSettings="'wght' 600, 'opsz' 9"
+                        fromFontVariationSettings="'wght' 800, 'opsz' 10"
                         toFontVariationSettings="'wght' 900, 'opsz' 20"
                         containerRef={containerRef}
                         radius={50}
                         falloff="linear"
                         style={{
-                            color: '#c4586f',
+                            color: '#F3F1EC',
                             fontSize: 'clamp(0.45rem, 1.3vw, 1.3rem)',
                             letterSpacing: '0.1em',
                             fontFamily: "'Playfair Display', Georgia, serif",
@@ -81,7 +81,7 @@ const Hero = () => {
                         }}
                     />
 
-                    <div className="w-full h-[2px] bg-[#fcf5f6]" />
+                    <div className="w-full h-[2px] bg-[#F3F1EC]" />
 
                     {/* CTA */}
                     <ShimmerButton

@@ -1,12 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
-
-// ─── ExpandOnHover types ──────────────────────────────────────────────────────
+import { useState, useRef, useEffect } from "react";
 
 interface TechStack {
   id: number;
@@ -185,7 +179,7 @@ const CardItem = ({ stack, isExpanded, onMouseEnter, onClick, width, isMobile }:
       className="relative cursor-pointer overflow-hidden rounded-3xl"
       style={{
         width,
-        height: "29rem",
+        height: "24rem",
         background: "#080808",
         border: "none",
         flexShrink: 0,
@@ -260,7 +254,7 @@ const CardItem = ({ stack, isExpanded, onMouseEnter, onClick, width, isMobile }:
   );
 };
 
-/* ─── ExpandOnHover Root ─────────────────────────────────────────────────────── */
+/* ─── Root ─────────────────────────────────────────────────────────────────── */
 
 const ExpandOnHover = () => {
   const [isMobile, setIsMobile] = useState<boolean>(() =>
@@ -333,230 +327,4 @@ const ExpandOnHover = () => {
   );
 };
 
-// ─── Floating decorative shape atoms ─────────────────────────────────────────
-function FloatShape({
-  children,
-  x,
-  y,
-  delay = 0,
-  duration = 5,
-  amplitude = 10,
-  rotate = 0,
-  opacity = 0.18,
-}: {
-  children: React.ReactNode;
-  x: string;
-  y: string;
-  delay?: number;
-  duration?: number;
-  amplitude?: number;
-  rotate?: number;
-  opacity?: number;
-}) {
-  return (
-    <motion.div
-      aria-hidden="true"
-      style={{
-        position: 'absolute',
-        left: x,
-        top: y,
-        color: '#F2F0EB',
-        opacity,
-        userSelect: 'none',
-        pointerEvents: 'none',
-        fontSize: 'clamp(20px, 3vw, 36px)',
-        rotate,
-      }}
-      animate={{ y: [0, -amplitude, 0], rotate: [rotate, rotate + 8, rotate] }}
-      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-// ─── SVG burst star (large bg) ────────────────────────────────────────────────
-function BgStar({ x, y, size = 40, opacity = 0.08, delay = 0 }: { x: string; y: string; size?: number; opacity?: number; delay?: number }) {
-  return (
-    <motion.div
-      aria-hidden="true"
-      style={{
-        position: 'absolute',
-        left: x,
-        top: y,
-        pointerEvents: 'none',
-        userSelect: 'none',
-        opacity,
-      }}
-      animate={{ rotate: [0, 360] }}
-      transition={{ duration: 18 + delay * 4, delay, repeat: Infinity, ease: 'linear' }}
-    >
-      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M20 2 L21.5 18 L36 20 L21.5 22 L20 38 L18.5 22 L4 20 L18.5 18 Z"
-          fill="#F2F0EB"
-        />
-        <path
-          d="M20 8 L21 18.5 L30 20 L21 21.5 L20 32 L19 21.5 L10 20 L19 18.5 Z"
-          fill="#F2F0EB"
-          opacity="0.5"
-          transform="rotate(45 20 20)"
-        />
-      </svg>
-    </motion.div>
-  );
-}
-
-
-
-export default function SkillsSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.headline-line',
-        { scaleX: 0 },
-        {
-          scaleX: 1,
-          duration: 1.2,
-          ease: 'power4.inOut',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-
-      gsap.fromTo(
-        '.left-content',
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 75%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-
-      // Pre-set will-change for GPU compositing before animation
-      gsap.set('.skill-card', { willChange: 'transform, opacity' });
-
-      gsap.fromTo(
-        '.skill-card',
-        { opacity: 0, y: 10 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'expo.out',
-          force3D: true,
-          scrollTrigger: {
-            trigger: rightRef.current,
-            start: 'top 95%',
-            toggleActions: 'play none none reverse',
-          },
-          onComplete: () => gsap.set('.skill-card', { willChange: 'auto' }),
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  return (
-    <section
-      ref={sectionRef}
-      className="w-full bg-[#0A0A0A] px-6 sm:px-10 md:px-16 lg:px-24 py-20 sm:py-28 lg:py-36 relative overflow-x-clip"
-    >
-      {/* ── Dot grid texture ─────────────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          opacity: 0.025,
-          backgroundImage: 'radial-gradient(circle at 1px 1px, #F2F0EB 1px, transparent 0)',
-          backgroundSize: '28px 28px',
-        }}
-      />
-      {/* ── Floating background shapes ────────────────────────────── */}
-      <BgStar x="6%" y="16%" size={52} opacity={0.1} delay={0} />
-      <BgStar x="88%" y="8%" size={38} opacity={0.08} delay={1.5} />
-      <BgStar x="78%" y="78%" size={46} opacity={0.07} delay={0.8} />
-      <BgStar x="3%" y="68%" size={30} opacity={0.07} delay={2} />
-
-
-      <FloatShape x="32%" y="20%" delay={0} duration={5.5} amplitude={12} opacity={0.22} rotate={0}>✳</FloatShape>
-
-      <FloatShape x="15%" y="82%" delay={0.6} duration={5} amplitude={10} opacity={0.16} rotate={-10}>◆</FloatShape>
-      <FloatShape x="90%" y="20%" delay={1.8} duration={7} amplitude={14} opacity={0.15} rotate={30}>✦</FloatShape>
-      <FloatShape x="70%" y="88%" delay={0.3} duration={5.8} amplitude={9} opacity={0.2} rotate={-5}>✳</FloatShape>
-
-      <FloatShape x="2%" y="45%" delay={0.9} duration={5.2} amplitude={8} opacity={0.18} rotate={-20}>◆</FloatShape>
-      <FloatShape x="60%" y="6%" delay={2.1} duration={7.5} amplitude={7} opacity={0.13} rotate={10}>✦</FloatShape>
-
-      
-
-      {/* Top label row */}
-      <div className="mb-14 sm:mb-20 relative">
-        <div className="flex items-center gap-5">
-          <span className="text-[10px] sm:text-xs tracking-[0.3em] text-white/30 uppercase font-medium" style={{ fontFamily: "'DM Mono', monospace" }}>
-            SKILLS — THAT MATTERS
-          </span>
-          <div className="headline-line flex-1 h-px bg-white/10 origin-left" />
-        </div>
-      </div>
-
-      {/* Main grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.7fr] gap-16 lg:gap-24 items-start relative">
-
-        {/* LEFT */}
-        <div className="left-content lg:sticky lg:top-24">
-          <h2
-            className="text-[#F2F0EB] text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter leading-[0.88] mb-8 sm:mb-10"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-          >
-            SKILLS
-          </h2>
-          <ExpandOnHover />
-
-          <p
-            className="text-sm sm:text-base text-[#F2F0EB]/45 leading-relaxed max-w-xs"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            Building end-to-end products — from pixel-perfect interfaces to scalable server architecture.
-            <span className="block mt-2 text-[#F2F0EB]/25">
-              Full-stack, production-ready, and always shipping.
-            </span>
-          </p>
-
-          {/* Emerald accent dot cluster */}
-          <div className="mt-16 hidden lg:flex items-center gap-1.5">
-            {[1, 2, 3].map(i => (
-              <div
-                key={i}
-                className="rounded-full bg-[#F2F0EB]/50"
-                style={{ width: i === 2 ? 6 : 4, height: i === 2 ? 6 : 4 }}
-              />
-            ))}
-          </div>
-        </div>
-
-
-      </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
-      `}</style>
-    </section>
-  );
-}
+export default ExpandOnHover;

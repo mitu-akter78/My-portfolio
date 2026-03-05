@@ -71,8 +71,8 @@ const Contact = () => {
                     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
                 }
                 .cta-btn:hover::before { transform: translateX(0); }
-                .cta-btn:hover { color: #A93D54; border-color: white; }
-                .cta-btn:hover .cta-arrow { color: #A93D54; transform: translate(3px, -3px); }
+                .cta-btn:hover { color: #0A0A0A; border-color: white; }
+                .cta-btn:hover .cta-arrow { color: #0A0A0A; transform: translate(3px, -3px); }
                 .cta-btn span, .cta-btn svg {
                     position: relative;
                     z-index: 1;
@@ -121,7 +121,7 @@ const Contact = () => {
                     background: rgba(252, 245, 246, 1);
                     transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 }
-                .social-link:hover { color: #A93D54; }
+                .social-link:hover { color: #F2F0EB; }
                 .social-link:hover::after { width: 100%; }
                 .social-link .social-arrow {
                     opacity: 0;
@@ -153,6 +153,14 @@ const Contact = () => {
 
                 @media (max-width: 640px) {
                     .side-label { display: none !important; }
+                    .contact-headline { 
+                        font-size: clamp(2rem, 10vw, 3.5rem) !important;
+                        line-height: 1.1 !important;
+                    }
+                }
+                .contact-headline {
+                    word-break: break-word;
+                    overflow-wrap: break-word;
                 }
             `}</style>
 
@@ -166,7 +174,8 @@ const Contact = () => {
                     padding: 'clamp(80px, 12vh, 140px) 0',
                     background: '#0A0A0A',
                     color: 'white',
-                    overflow: 'hidden',
+                    overflowX: 'clip',
+                    overflowY: 'visible',
                     minHeight: '100vh',
                     display: 'flex',
                     alignItems: 'center',
@@ -214,7 +223,7 @@ const Contact = () => {
 
                         {/* Line 1 */}
                         <h2
-                            className={`reveal-up delay-2 ${isVisible ? 'visible' : ''}`}
+                            className={`reveal-up delay-2 contact-headline ${isVisible ? 'visible' : ''}`}
                             style={{
                                 fontFamily: "'Playfair Display', serif",
                                 fontSize: 'clamp(2rem, 4.2vw, 5.5rem)',
@@ -237,7 +246,7 @@ const Contact = () => {
                                     fontStyle: 'italic',
                                     fontWeight: 700,
                                     fontSize: 'clamp(2.2rem, 6vw, 6.2rem)',
-                                    color: '#A93D54',
+                                    color: '#F2F0EB',
                                     letterSpacing: '-0.01em',
                                     lineHeight: 1.0,
                                 }}
@@ -248,7 +257,7 @@ const Contact = () => {
 
                         {/* Line 3 */}
                         <h2
-                            className={`reveal-up delay-4 ${isVisible ? 'visible' : ''}`}
+                            className={`reveal-up delay-4 contact-headline ${isVisible ? 'visible' : ''}`}
                             style={{
                                 fontFamily: "'Playfair Display', serif",
                                 fontSize: 'clamp(2rem, 4.3vw, 5.5rem)',

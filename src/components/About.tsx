@@ -1,123 +1,327 @@
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { MagicText } from './ui/magic-text';
-import {Aboutme} from './ui/text-scroll'
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { EditorialAboutText } from './ui/magic-text';
 
-// ─── 3D character reveal — used ONLY on the "ABOUT ME" watermark ──────────────
-function RevealText({ text, className }: { text: string; className?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
 
-  const chars = Array.from(text);
-
-  const getInitial = (i: number) => {
-    const seed = (i * 137 + 42) % 360;
-    const rotX = ((seed % 3) - 1) * 90;
-    const rotY = (((seed * 7) % 3) - 1) * 75;
-    const rotZ = (((seed * 13) % 7) - 3) * 18;
-    return { rotateX: rotX, rotateY: rotY, rotateZ: rotZ, opacity: 0, scale: 0.6 };
-  };
-
-  return (
-    <span
-      ref={ref}
-      className={className}
-      style={{ display: 'inline-flex', flexWrap: 'nowrap', perspective: '800px' }}
-    >
-      {chars.map((char, i) => (
-        <motion.span
-          key={i}
-          style={{
-            display: 'inline-block',
-            whiteSpace: char === ' ' ? 'pre' : 'normal',
-            transformStyle: 'preserve-3d',
-            ...(char === ' ' ? { width: '0.3em' } : {}),
-          }}
-          initial={getInitial(i)}
-          animate={
-            isInView
-              ? { rotateX: 0, rotateY: 0, rotateZ: 0, opacity: 0.1, scale: 1 }
-              : getInitial(i)
-          }
-          transition={{
-            duration: 0.6,
-            delay: i * 0.04,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        >
-          {char}
-        </motion.span>
-      ))}
-      <span className="sr-only">{text}</span>
-    </span>
-  );
-}
-
-// ─── Floating character SVG ───────────────────────────────────────────────────
-function Character() {
+// ─── Floating decorative shape atoms ─────────────────────────────────────────
+function FloatShape({
+  children,
+  x,
+  y,
+  delay = 0,
+  duration = 5,
+  amplitude = 10,
+  rotate = 0,
+  opacity = 0.18,
+}: {
+  children: React.ReactNode;
+  x: string;
+  y: string;
+  delay?: number;
+  duration?: number;
+  amplitude?: number;
+  rotate?: number;
+  opacity?: number;
+}) {
   return (
     <motion.div
       aria-hidden="true"
-      className="w-[120px] h-[120px] md:w-[140px] md:h-[140px] rounded-full bg-[#E8E4DC] flex items-center justify-center shadow-lg border-4 border-[#0A0A0A]"
-      animate={{ y: [0, -8, 0] }}
-      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        color: '#F2F0EB',
+        opacity,
+        userSelect: 'none',
+        pointerEvents: 'none',
+        fontSize: 'clamp(20px, 3vw, 36px)',
+        rotate,
+      }}
+      animate={{ y: [0, -amplitude, 0], rotate: [rotate, rotate + 8, rotate] }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
     >
-      <svg width="60%" height="60%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="55" r="8" fill="#FFB6C1" opacity="0.6" />
-        <circle cx="80" cy="55" r="8" fill="#FFB6C1" opacity="0.6" />
-        <path d="M 25 45 Q 35 35 45 45" stroke="#1C1C1C" strokeWidth="4" strokeLinecap="round" fill="none" />
-        <path d="M 55 45 Q 65 35 75 45" stroke="#1C1C1C" strokeWidth="4" strokeLinecap="round" fill="none" />
-        <path d="M 42 65 Q 50 75 58 65" stroke="#1C1C1C" strokeWidth="4" strokeLinecap="round" fill="none" />
+      {children}
+    </motion.div>
+  );
+}
+
+// ─── SVG burst star (large bg) ────────────────────────────────────────────────
+function BgStar({ x, y, size = 40, opacity = 0.08, delay = 0 }: { x: string; y: string; size?: number; opacity?: number; delay?: number }) {
+  return (
+    <motion.div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        pointerEvents: 'none',
+        userSelect: 'none',
+        opacity,
+      }}
+      animate={{ rotate: [0, 360] }}
+      transition={{ duration: 18 + delay * 4, delay, repeat: Infinity, ease: 'linear' }}
+    >
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M20 2 L21.5 18 L36 20 L21.5 22 L20 38 L18.5 22 L4 20 L18.5 18 Z"
+          fill="#F2F0EB"
+        />
+        <path
+          d="M20 8 L21 18.5 L30 20 L21 21.5 L20 32 L19 21.5 L10 20 L19 18.5 Z"
+          fill="#F2F0EB"
+          opacity="0.5"
+          transform="rotate(45 20 20)"
+        />
       </svg>
+    </motion.div>
+  );
+}
+
+// ─── Circle outline shape ─────────────────────────────────────────────────────
+function BgCircle({ x, y, size = 60, opacity = 0.07, delay = 0 }: { x: string; y: string; size?: number; opacity?: number; delay?: number }) {
+  return (
+    <motion.div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        pointerEvents: 'none',
+        userSelect: 'none',
+        opacity,
+        borderRadius: '50%',
+        border: '1.5px solid #F2F0EB',
+        width: size,
+        height: size,
+      }}
+      animate={{ scale: [1, 1.08, 1] }}
+      transition={{ duration: 6 + delay, delay, repeat: Infinity, ease: 'easeInOut' }}
+    />
+  );
+}
+
+// ─── 3D tilt card ─────────────────────────────────────────────────────────────
+function TiltCard({ children }: { children: React.ReactNode }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(rawY, [-0.5, 0.5], [6, -6]), { stiffness: 200, damping: 25 });
+  const rotateY = useSpring(useTransform(rawX, [-0.5, 0.5], [-6, 6]), { stiffness: 200, damping: 25 });
+  const shine = useTransform(rawX, [-0.5, 0.5], ['rgba(255,255,255,0)', 'rgba(255,255,255,0.07)']);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const el = cardRef.current;
+    if (!el) return;
+    const { left, top, width, height } = el.getBoundingClientRect();
+    rawX.set((e.clientX - left) / width - 0.5);
+    rawY.set((e.clientY - top) / height - 0.5);
+  }
+
+  function handleMouseLeave() {
+    rawX.set(0);
+    rawY.set(0);
+  }
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+        perspective: 900,
+        borderRadius: '20px',
+        willChange: 'transform',
+        position: 'relative',
+      }}
+    >
+      {/* Shine layer */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '20px',
+          background: shine,
+          pointerEvents: 'none',
+          zIndex: 10,
+        }}
+      />
+
+      {/* Card surface */}
+      <div
+        style={{
+          background: '#F2F0EB',
+          borderRadius: '20px',
+          padding: 'clamp(2rem, 5vw, 3rem)',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.07), 0 10px 20px rgba(0,0,0,0.12), 0 30px 60px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.6)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Card inner top-left accent */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background: 'linear-gradient(90deg, transparent, rgba(10,10,10,0.08), transparent)',
+            pointerEvents: 'none',
+          }}
+        />
+        {children}
+      </div>
     </motion.div>
   );
 }
 
 // ─── Main About section ───────────────────────────────────────────────────────
 export default function About() {
-   const sectionRef = useRef<HTMLElement>(null);
-  return (
-    <section 
-      ref={sectionRef}
-      className="relative w-full min-h-screen bg-[#0A0A0A] flex items-center justify-center overflow-x-clip font-sans">
+  const sectionRef = useRef<HTMLElement>(null!);
 
-      {/* Subtle background texture */}
+  return (
+    <section
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100svh',
+        background: '#0A0A0A',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflowX: 'clip',
+        overflowY: 'visible',
+        fontFamily: "'Georgia', 'Times New Roman', serif",
+      }}
+    >
+
+      {/* ── Dot grid texture ─────────────────────────────────────── */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        aria-hidden="true"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-          backgroundSize: '32px 32px',
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          opacity: 0.025,
+          backgroundImage: 'radial-gradient(circle at 1px 1px, #F2F0EB 1px, transparent 0)',
+          backgroundSize: '28px 28px',
         }}
       />
 
-      {/* Background watermark — THIS is where the 3D reveal effect lives */}
+
+      {/* ── Floating background shapes ────────────────────────────── */}
+      <BgStar x="6%" y="12%" size={52} opacity={0.1} delay={0} />
+      <BgStar x="88%" y="8%" size={38} opacity={0.08} delay={1.5} />
+      <BgStar x="78%" y="78%" size={46} opacity={0.07} delay={0.8} />
+      <BgStar x="3%" y="68%" size={30} opacity={0.07} delay={2} />
+
+      <BgCircle x="12%" y="72%" size={80} opacity={0.07} delay={1} />
+      <BgCircle x="82%" y="30%" size={55} opacity={0.06} delay={2.5} />
+      <BgCircle x="50%" y="5%" size={40} opacity={0.05} delay={0.5} />
+
+      <FloatShape x="8%" y="20%" delay={0} duration={5.5} amplitude={12} opacity={0.22} rotate={0}>✳</FloatShape>
+      <FloatShape x="85%" y="55%" delay={1} duration={6} amplitude={8} opacity={0.18} rotate={15}>✚</FloatShape>
+      <FloatShape x="15%" y="82%" delay={0.6} duration={5} amplitude={10} opacity={0.16} rotate={-10}>◆</FloatShape>
+      <FloatShape x="90%" y="20%" delay={1.8} duration={7} amplitude={14} opacity={0.15} rotate={30}>✦</FloatShape>
+      <FloatShape x="70%" y="88%" delay={0.3} duration={5.8} amplitude={9} opacity={0.2} rotate={-5}>✳</FloatShape>
+      <FloatShape x="45%" y="90%" delay={1.2} duration={6.5} amplitude={11} opacity={0.14} rotate={20}>✚</FloatShape>
+      <FloatShape x="2%" y="45%" delay={0.9} duration={5.2} amplitude={8} opacity={0.18} rotate={-20}>◆</FloatShape>
+      <FloatShape x="60%" y="6%" delay={2.1} duration={7.5} amplitude={7} opacity={0.13} rotate={10}>✦</FloatShape>
+
+      {/* ── Vignette gradient ────────────────────────────────────── */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-6 flex justify-center md:justify-end md:top-4 md:pr-12 lg:pr-50 pointer-events-none select-none"
-      >
-        <Aboutme containerRef={sectionRef} />  
-      </div>
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, #0A0A0A 60%)',
+        }}
+      />
 
-      {/* Content container — unchanged from your original */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-center">
+      {/* ── Content ──────────────────────────────────────────────── */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: 'clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 4rem)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        {/* Section label */}
         <motion.div
-          className="relative w-full md:w-[80%] lg:w-[500px] mt-5 md:mt-0.5 lg:mt-32"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            color: '#F2F0EB',
+            fontSize: 'clamp(0.65rem, 1.2vw, 0.75rem)',
+            fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            opacity: 0.45,
+            marginBottom: 'clamp(1.5rem, 3vw, 2.5rem)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
+          <span style={{ width: 28, height: '1px', background: '#F2F0EB', opacity: 0.4, display: 'inline-block' }} />
+          About Me
+          <span style={{ width: 28, height: '1px', background: '#F2F0EB', opacity: 0.4, display: 'inline-block' }} />
+        </motion.div>
+
+        {/* Card — constrained width for editorial feel */}
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.65, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+          style={{ width: '100%', maxWidth: 640 }}
         >
-          <div className="absolute -top-16 -left-6 md:-top-16 md:-left-16 z-20">
-            <Character />
-          </div>
+          <TiltCard>
+            <EditorialAboutText />
+          </TiltCard>
+        </motion.div>
 
-          {/* Card — exactly as you had it, MagicText untouched */}
-          <div className="bg-[#F2F0EB] rounded-xl p-8 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-            <div className="float-left w-[72px] h-[56px] md:w-[80px] md:h-[64px] [shape-outside:circle(50%_at_0%_0%)]" />
-            <div className="text-[#5c1d2a] text-[15px] md:text-base leading-[1.7]">
-              <MagicText text="  Hi there! I'm Sadia, a full stack developer from bangladesh. Passionate about building clean, performant, and user-friendly applications. I specialize in turning complex problems into elegant digital solutions. <br/> <br/> I work across the full stack — crafting responsive frontends with React and Next.js, building robust backends with Node.js and databases, and deploying scalable apps to the cloud. I care deeply about code quality, developer experience, and writing software that's as readable as it is functional." />
-            </div>
-          </div>
+        {/* Bottom scroll-hint */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          style={{
+            marginTop: 'clamp(2.5rem, 5vw, 4rem)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            color: '#F2F0EB',
+            opacity: 0.25,
+            fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+            fontSize: '0.7rem',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+          }}
+        >
+          <motion.span
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            ↓
+          </motion.span>
+          scroll
         </motion.div>
       </div>
     </section>
