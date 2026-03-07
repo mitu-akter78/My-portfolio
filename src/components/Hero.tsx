@@ -14,7 +14,7 @@ const Hero = () => {
         >
             <div className="absolute inset-0 z-0">
                 <ColorBends
-                    colors={["#525252", "#786d6f"]}
+                    colors={["#525252", "#727273"]}
                     rotation={0}
                     speed={0.2}
                     scale={1}
@@ -27,15 +27,6 @@ const Hero = () => {
                     autoRotate={0}
                 />
             </div>
-
-
-            {/* Radial glow */}
-            <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)',
-                }}
-            />
 
             <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-full">
                 {/* Name */}
