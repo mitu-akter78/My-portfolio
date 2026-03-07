@@ -83,7 +83,7 @@ const ProjectCard = ({ project }: { project: typeof PROJECTS[0] }) => {
                 .pc-root {
                     position: relative;
                     cursor: pointer;
-                    aspect-ratio: 16/10;
+                    aspect-ratio: 18/10;
                     background: #090909;
                     overflow: hidden;
                     transition: border-color 0.4s ease;
@@ -142,31 +142,6 @@ const ProjectCard = ({ project }: { project: typeof PROJECTS[0] }) => {
                 .pc-corner--bl { bottom: 7px; left: 7px;    border-bottom: 1px solid rgba(255,255,255,0.4); border-left: 1px solid rgba(255,255,255,0.4); }
                 .pc-corner--br { bottom: 7px; right: 7px;   border-bottom: 1px solid rgba(255,255,255,0.4); border-right: 1px solid rgba(255,255,255,0.4); }
 
-                /* Progress dots */
-                .pc-dots {
-                    position: absolute;
-                    bottom: 9px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    display: flex;
-                    gap: 5px;
-                    z-index: 7;
-                    opacity: 0;
-                    transition: opacity 0.3s ease 0.15s;
-                    pointer-events: none;
-                }
-                .pc-root:hover .pc-dots { opacity: 1; }
-                .pc-dot {
-                    width: 4px;
-                    height: 4px;
-                    border-radius: 50%;
-                    background: rgba(255,255,255,0.2);
-                    transition: background 0.2s ease, transform 0.2s ease;
-                }
-                .pc-dot--active {
-                    background: rgba(255,255,255,0.85);
-                    transform: scale(1.35);
-                }
 
                 /* Number + year tags */
                 .pc-num, .pc-year {
@@ -214,16 +189,6 @@ const ProjectCard = ({ project }: { project: typeof PROJECTS[0] }) => {
                 {/* ── Tags ── */}
                 <span className="pc-num" style={{ color: isHovered ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)' }}>{project.num}</span>
                 <span className="pc-year" style={{ color: isHovered ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.18)' }}>{project.year}</span>
-
-                {/* ── Cycle progress dots ── */}
-                <div className="pc-dots">
-                    {project.images.map((_, i) => (
-                        <div
-                            key={i}
-                            className={`pc-dot${isHovered && i === currentImageIdx ? ' pc-dot--active' : ''}`}
-                        />
-                    ))}
-                </div>
             </div>
         </>
     );
@@ -261,7 +226,7 @@ const Projects = () => {
 
                 .projects-title {
                     font-family: 'Playfair Display', Georgia, serif;
-                    font-size: clamp(32px, 7vw, 88px);
+                    font-size: clamp(32px, 5vw, 88px);
                     letter-spacing: -0.05em;
                     color: #fcf5f6;
                     line-height: 1;
@@ -323,65 +288,13 @@ const Projects = () => {
                     border: 1px solid #1a1a1a;
                 }
 
-                /* CTA */
-                .cta-section {
-                    margin-top: 80px;
-                    padding: 0;
-                    position: relative;
-                }
+              
+                
 
-                .cta-wrapper {
-                    border-top: 1px dashed #2a2a2a;
-                    border-bottom: 1px dashed #2a2a2a;
-                    padding: 20px 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    cursor: pointer;
-                    transition: background 0.3s ease;
-                    position: relative;
-                    overflow: hidden;
-                }
 
-                .cta-wrapper::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background: #fff;
-                    transform: scaleX(0);
-                    transform-origin: left;
-                    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-                }
+               
 
-                .cta-wrapper:hover::before {
-                    transform: scaleX(1);
-                }
-
-                .cta-text {
-                    font-family: 'Bebas Neue', sans-serif;
-                    font-size: clamp(22px, 2vw, 36px);
-                    letter-spacing: 0.2em;
-                    color: #e8e8e8;
-                    position: relative;
-                    z-index: 1;
-                    transition: color 0.5s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-                }
-
-                .cta-wrapper:hover .cta-text {
-                    color: #0A0A0A;
-                }
-
-                .cta-arrow {
-                    display: inline-block;
-                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-
-                .cta-wrapper:hover .cta-arrow {
-                    transform: translateX(8px);
-                }
+                
 
                 @media (max-width: 768px) {
                     #projects-section { padding: 48px 20px; }
@@ -424,15 +337,7 @@ const Projects = () => {
                     ))}
                 </div>
 
-                {/* CTA */}
-                <div className="cta-section">
-                    <div className="cta-wrapper">
-                        <span className="cta-text">
-                            Start a Project
-                            <span className="cta-arrow">→</span>
-                        </span>
-                    </div>
-                </div>
+                
 
                 <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');

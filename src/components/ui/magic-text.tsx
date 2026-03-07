@@ -218,14 +218,6 @@ export function EditorialAboutText() {
         </p>
       </FadeIn>
 
-      {/* ── Para 3 ── */}
-      <FadeIn delay={0.32}>
-        <p style={body}>
-          I care about maintainable architecture, developer experience, and building software that
-          can grow with the needs of the product.
-        </p>
-      </FadeIn>
-
       {/* ── Divider ornament 2 ── */}
       <FadeIn delay={0.38}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>

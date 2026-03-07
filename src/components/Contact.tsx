@@ -1,5 +1,6 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from './ui/Button';
 
 const Contact = () => {
     const sectionRef = useRef<HTMLElement>(null);
@@ -43,44 +44,9 @@ const Contact = () => {
                 .delay-4 { transition-delay: 0.55s; }
                 .delay-5 { transition-delay: 0.7s; }
 
-                .cta-btn {
-                    position: relative;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 16px;
-                    padding: 18px 40px;
-                    border: 1px solid rgba(255,255,255,0.15);
-                    border-radius: 2px;
-                    background: transparent;
-                    color: #fcf5f6;
-                    font-family: 'DM Mono', monospace;
-                    font-size: 13px;
-                    letter-spacing: 0.15em;
-                    text-transform: uppercase;
-                    text-decoration: none;
-                    overflow: hidden;
-                    cursor: pointer;
-                    transition: border-color 0.4s ease, color 0.4s ease;
-                }
-                .cta-btn::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background: #fcf5f6;
-                    transform: translateX(-101%);
-                    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-                .cta-btn:hover::before { transform: translateX(0); }
-                .cta-btn:hover { color: #0A0A0A; border-color: white; }
-                .cta-btn:hover .cta-arrow { color: #0A0A0A; transform: translate(3px, -3px); }
-                .cta-btn span, .cta-btn svg {
-                    position: relative;
-                    z-index: 1;
-                    transition: color 0.4s ease, transform 0.4s ease;
-                }
                 .cta-arrow {
-                    transform: rotate(-45deg);
-                    transition: color 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    display: inline-block;
+                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 }
 
                 .line-accent {
@@ -244,11 +210,14 @@ const Contact = () => {
                                 style={{
                                     fontFamily: "'Playfair Display', serif",
                                     fontStyle: 'italic',
-                                    fontWeight: 700,
-                                    fontSize: 'clamp(2.2rem, 6vw, 6.2rem)',
-                                    color: '#F2F0EB',
-                                    letterSpacing: '-0.01em',
-                                    lineHeight: 1.0,
+                                    fontWeight: 800,
+                                    fontSize: 'clamp(3.9rem, 6vw, 6.2rem)',
+                                    letterSpacing: '-0.001em',
+                                    lineHeight: 1,
+                                    // Add these three lines:
+                                    background: 'linear-gradient(to right, #F2F0EB, #A8A6A1)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
                                 }}
                             >
                                 remarkable
@@ -306,10 +275,19 @@ const Contact = () => {
                                 my inbox is always open.
                             </p>
 
-                            <a href="mailto:hello@example.com" className="cta-btn" style={{ alignSelf: 'flex-start' }}>
-                                <span>Work With Me</span>
-                                <ArrowRight size={14} className="cta-arrow" />
-                            </a>
+                            <Button 
+                                render={(props) => <a href="mailto:hello@example.com" {...props} />}
+                                className="group not-disabled:inset-shadow-none flex cursor-pointer items-center justify-center gap-0 rounded-full border-none bg-transparent px-0 py-5 font-normal shadow-none hover:bg-transparent [:hover,[data-pressed]]:bg-transparent"
+                                style={{ alignSelf: 'flex-start' }}
+                            >
+                                <span className="rounded-full bg-[#FCF5F6] px-6 py-3 text-black duration-500 ease-in-out group-hover:bg-zinc-800 group-hover:text-white group-hover:transition-colors">
+                                    Start a Project
+                                </span>
+                                <div className="relative flex h-fit cursor-pointer items-center overflow-hidden rounded-full bg-white p-5 text-black duration-500 ease-in-out group-hover:bg-zinc-800 group-hover:text-white group-hover:transition-colors">
+                                    <ArrowUpRight className="absolute h-5 w-5 -translate-x-1/2 transition-all duration-500 ease-in-out group-hover:translate-x-10" />
+                                    <ArrowUpRight className="absolute h-5 w-5 -translate-x-10 transition-all duration-500 ease-in-out group-hover:-translate-x-1/2" />
+                                </div>
+                            </Button>
                         </div>
 
                         {/* Right: socials */}

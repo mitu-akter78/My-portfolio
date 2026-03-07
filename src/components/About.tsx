@@ -216,23 +216,19 @@ export default function About() {
 
 
       {/* ── Floating background shapes ────────────────────────────── */}
-      <BgStar x="6%" y="12%" size={52} opacity={0.1} delay={0} />
-      <BgStar x="88%" y="8%" size={38} opacity={0.08} delay={1.5} />
-      <BgStar x="78%" y="78%" size={46} opacity={0.07} delay={0.8} />
-      <BgStar x="3%" y="68%" size={30} opacity={0.07} delay={2} />
+      <BgStar x="30%" y="5%" size={62} opacity={0.8} delay={0} />
+      <BgStar x="83%" y="18%" size={46} opacity={1} delay={0.8} />
 
-      <BgCircle x="12%" y="72%" size={80} opacity={0.07} delay={1} />
-      <BgCircle x="82%" y="30%" size={55} opacity={0.06} delay={2.5} />
-      <BgCircle x="50%" y="5%" size={40} opacity={0.05} delay={0.5} />
+      <BgCircle x="12%" y="72%" size={80} opacity={0.3} delay={1} />
 
       <FloatShape x="8%" y="20%" delay={0} duration={5.5} amplitude={12} opacity={0.22} rotate={0}>✳</FloatShape>
       <FloatShape x="85%" y="55%" delay={1} duration={6} amplitude={8} opacity={0.18} rotate={15}>✚</FloatShape>
       <FloatShape x="15%" y="82%" delay={0.6} duration={5} amplitude={10} opacity={0.16} rotate={-10}>◆</FloatShape>
       <FloatShape x="90%" y="20%" delay={1.8} duration={7} amplitude={14} opacity={0.15} rotate={30}>✦</FloatShape>
       <FloatShape x="70%" y="88%" delay={0.3} duration={5.8} amplitude={9} opacity={0.2} rotate={-5}>✳</FloatShape>
-      <FloatShape x="45%" y="90%" delay={1.2} duration={6.5} amplitude={11} opacity={0.14} rotate={20}>✚</FloatShape>
-      <FloatShape x="2%" y="45%" delay={0.9} duration={5.2} amplitude={8} opacity={0.18} rotate={-20}>◆</FloatShape>
-      <FloatShape x="60%" y="6%" delay={2.1} duration={7.5} amplitude={7} opacity={0.13} rotate={10}>✦</FloatShape>
+      <FloatShape x="35%" y="90%" delay={1.2} duration={6.5} amplitude={11} opacity={0.3} rotate={20}>✚</FloatShape>
+      <FloatShape x="20%" y="45%" delay={0.9} duration={5.2} amplitude={8} opacity={0.18} rotate={-20}>◆</FloatShape>
+      <FloatShape x="60%" y="6%" delay={2.1} duration={7.5} amplitude={7} opacity={0.3} rotate={10}>✦</FloatShape>
 
       {/* ── Vignette gradient ────────────────────────────────────── */}
       <div
@@ -241,7 +237,7 @@ export default function About() {
           position: 'absolute',
           inset: 0,
           pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, #0A0A0A 60%)',
+          background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, #0A0A0A 75%)',
         }}
       />
 
