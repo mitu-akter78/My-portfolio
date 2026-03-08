@@ -79,10 +79,10 @@ const Hero = () => {
                         className="mt-12 shadow-2xl"
                         shimmerColor="#ffffff"
                         background="rgba(10, 10, 10, 1)"
-                        onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                        onClick={() => document.getElementById('projects-section')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                         <span className="whitespace-pre-wrap text-center text-base font-medium leading-none tracking-tight text-[#fcf5f6] dark:from-white dark:to-slate-900/10 lg:text-lg">
-                            Hire Me
+                            View work
                         </span>
                     </ShimmerButton>
                 </div>

@@ -199,6 +199,9 @@ const Contact = () => {
                                 letterSpacing: '-0.02em',
                                 margin: 0,
                                 color: '#fcf5f6',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                display: 'flex',
                             }}
                         >
                             Let's build something
@@ -215,9 +218,12 @@ const Contact = () => {
                                     letterSpacing: '-0.001em',
                                     lineHeight: 1,
                                     // Add these three lines:
-                                    background: 'linear-gradient(to right, #F2F0EB, #A8A6A1)',
+                                    background: 'linear-gradient(to right, #919190, #ffffff, #919190)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
+                                    alignItems: 'center',
+                                justifyContent: 'center',
+                                display: 'flex',
                                 }}
                             >
                                 remarkable
@@ -236,6 +242,9 @@ const Contact = () => {
                                 letterSpacing: '-0.02em',
                                 margin: 0,
                                 color: '#fcf5f6',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                display: 'flex',
                             }}
                         >
                             together.
@@ -281,7 +290,7 @@ const Contact = () => {
                                 style={{ alignSelf: 'flex-start' }}
                             >
                                 <span className="rounded-full bg-[#FCF5F6] px-6 py-3 text-black duration-500 ease-in-out group-hover:bg-zinc-800 group-hover:text-white group-hover:transition-colors">
-                                    Start a Project
+                                    Get In Touch
                                 </span>
                                 <div className="relative flex h-fit cursor-pointer items-center overflow-hidden rounded-full bg-white p-5 text-black duration-500 ease-in-out group-hover:bg-zinc-800 group-hover:text-white group-hover:transition-colors">
                                     <ArrowUpRight className="absolute h-5 w-5 -translate-x-1/2 transition-all duration-500 ease-in-out group-hover:translate-x-10" />

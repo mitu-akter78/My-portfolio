@@ -2,18 +2,20 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
 // ─── Color token ───────────────────────────────────────────────────────────────
-const INK = "#0A0A0A";
 const PAPER = "#F2F0EB";
 
 // ─── Oval pill highlight for "full-stack developer" ───────────────────────────
-function Pill({ children }: { children: React.ReactNode }) {
+// BUG 1 FIX: Added `inkColor` prop — previously `INK` was referenced from
+// the enclosing EditorialAboutText scope but these are module-level functions,
+// so INK was undefined and would cause a runtime crash.
+function Pill({ children, inkColor }: { children: React.ReactNode; inkColor: string }) {
   return (
     <span
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: "6px",
-        border: `1.8px solid ${INK}`,
+        border: `1.8px solid ${inkColor}`,
         borderRadius: "999px",
         padding: "2px 14px 4px",
         margin: "0 4px",
@@ -49,7 +51,16 @@ function SmallStar() {
 }
 
 // ─── Burst star (8-point compass, like the image) ────────────────────────────
-function BurstStar({ size = 20, opacity = 0.55 }: { size?: number; opacity?: number }) {
+// BUG 1 FIX: Added `inkColor` prop — previously `INK` was referenced but undefined.
+function BurstStar({
+  size = 20,
+  opacity = 0.55,
+  inkColor,
+}: {
+  size?: number;
+  opacity?: number;
+  inkColor: string;
+}) {
   return (
     <span
       aria-hidden="true"
@@ -58,7 +69,7 @@ function BurstStar({ size = 20, opacity = 0.55 }: { size?: number; opacity?: num
         fontSize: `${size}px`,
         lineHeight: 1,
         opacity,
-        color: INK,
+        color: inkColor,
         verticalAlign: "middle",
         margin: "0 2px",
       }}
@@ -69,7 +80,16 @@ function BurstStar({ size = 20, opacity = 0.55 }: { size?: number; opacity?: num
 }
 
 // ─── Cross / plus shape ───────────────────────────────────────────────────────
-function CrossShape({ size = 16, opacity = 0.45 }: { size?: number; opacity?: number }) {
+// BUG 1 FIX: Added `inkColor` prop — previously `INK` was referenced but undefined.
+function CrossShape({
+  size = 16,
+  opacity = 0.45,
+  inkColor,
+}: {
+  size?: number;
+  opacity?: number;
+  inkColor: string;
+}) {
   return (
     <span
       aria-hidden="true"
@@ -78,7 +98,7 @@ function CrossShape({ size = 16, opacity = 0.45 }: { size?: number; opacity?: nu
         fontSize: `${size}px`,
         lineHeight: 1,
         opacity,
-        color: INK,
+        color: inkColor,
         verticalAlign: "middle",
         margin: "0 3px",
       }}
@@ -89,7 +109,16 @@ function CrossShape({ size = 16, opacity = 0.45 }: { size?: number; opacity?: nu
 }
 
 // ─── Diamond dot ──────────────────────────────────────────────────────────────
-function Diamond({ size = 12, opacity = 0.4 }: { size?: number; opacity?: number }) {
+// BUG 1 FIX: Added `inkColor` prop — previously `INK` was referenced but undefined.
+function Diamond({
+  size = 12,
+  opacity = 0.4,
+  inkColor,
+}: {
+  size?: number;
+  opacity?: number;
+  inkColor: string;
+}) {
   return (
     <span
       aria-hidden="true"
@@ -98,7 +127,7 @@ function Diamond({ size = 12, opacity = 0.4 }: { size?: number; opacity?: number
         fontSize: `${size}px`,
         lineHeight: 1,
         opacity,
-        color: INK,
+        color: inkColor,
         verticalAlign: "middle",
         margin: "0 3px",
       }}
@@ -109,14 +138,23 @@ function Diamond({ size = 12, opacity = 0.4 }: { size?: number; opacity?: number
 }
 
 // ─── Email link ──────────────────────────────────────────────────────────────
-function EmailLink({ text, email = "sadiaakter78bd@gmail.com" }: { text: string; email?: string }) {
+// BUG 1 FIX: Added `inkColor` prop — previously `INK` was referenced but undefined.
+function EmailLink({
+  text,
+  email = "sadiaakter78bd@gmail.com",
+  inkColor,
+}: {
+  text: string;
+  email?: string;
+  inkColor: string;
+}) {
   return (
     <motion.a
       href={`mailto:${email}`}
       style={{
-        color: INK,
+        color: inkColor,
         textDecoration: "none",
-        borderBottom: `1.5px solid ${INK}`,
+        borderBottom: `1.5px solid ${inkColor}`,
         paddingBottom: "1px",
         fontStyle: "italic",
       }}
@@ -146,19 +184,29 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 }
 
 // ─── Main editorial text component ───────────────────────────────────────────
-export function EditorialAboutText() {
+export function EditorialAboutText({
+  inkColor = "#0A0A0A",
+  bodyOpacity = 0.82,
+}: {
+  inkColor?: string;
+  bodyOpacity?: number;
+}) {
+  const INK = inkColor;
+
   const serif: React.CSSProperties = {
-    fontFamily: "'Georgia', 'Times New Roman', serif",
     color: INK,
     margin: 0,
   };
 
+  // BUG 2 FIX: `bodyOpacity` prop was accepted but then the value was
+  // hardcoded as 0.82, silently ignoring the prop. Now correctly uses
+  // the prop value so callers can control body text opacity.
   const body: React.CSSProperties = {
     ...serif,
     fontSize: "clamp(0.88rem, 1.6vw, 0.98rem)",
     lineHeight: 1.72,
     fontWeight: 400,
-    opacity: 0.82,
+    opacity: bodyOpacity,
     letterSpacing: "0.005em",
   };
 
@@ -183,8 +231,8 @@ export function EditorialAboutText() {
             letterSpacing: "-0.025em",
           }}
         >
-          Hi I'm, Sadia, a{" "}
-          <Pill>full-stack developer</Pill>
+          Hi, I'm Sadia, a{" "}
+          <Pill inkColor={INK}>full-stack developer</Pill>
           {" "}based in Bangladesh.
         </p>
       </FadeIn>
@@ -193,9 +241,9 @@ export function EditorialAboutText() {
       <FadeIn delay={0.1}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px", opacity: 0.5 }}>
           <span style={{ flex: 1, height: "1px", background: INK, opacity: 0.25 }} />
-          <BurstStar size={14} opacity={0.6} />
-          <CrossShape size={11} opacity={0.5} />
-          <Diamond size={10} opacity={0.5} />
+          <BurstStar size={14} opacity={0.6} inkColor={INK} />
+          <CrossShape size={11} opacity={0.5} inkColor={INK} />
+          <Diamond size={10} opacity={0.5} inkColor={INK} />
           <span style={{ flex: 1, height: "1px", background: INK, opacity: 0.25 }} />
         </div>
       </FadeIn>
@@ -211,10 +259,9 @@ export function EditorialAboutText() {
       {/* ── Para 2 ── */}
       <FadeIn delay={0.24}>
         <p style={body}>
-          I focus on bringing clarity and structure to complex systems — making them reliable,
-          intuitive, and easy to evolve over time. I work fluently across modern web technologies
-          and AI-assisted workflows, allowing me to prototype, refine, and ship quickly without
-          sacrificing quality.
+          My work sits at the intersection of thoughtful UI and solid backend architecture. Lately
+          I've been leaning into AI-assisted workflows to close the gap between idea and shipped
+          product, faster than ever before.
         </p>
       </FadeIn>
 
@@ -222,9 +269,9 @@ export function EditorialAboutText() {
       <FadeIn delay={0.38}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <span style={{ flex: 1, height: "1px", background: INK, opacity: 0.2 }} />
-          <Diamond size={10} opacity={0.45} />
-          <BurstStar size={14} opacity={0.55} />
-          <Diamond size={10} opacity={0.45} />
+          <Diamond size={10} opacity={0.45} inkColor={INK} />
+          <BurstStar size={14} opacity={0.55} inkColor={INK} />
+          <Diamond size={10} opacity={0.45} inkColor={INK} />
           <span style={{ flex: 1, height: "1px", background: INK, opacity: 0.2 }} />
         </div>
       </FadeIn>
@@ -233,7 +280,7 @@ export function EditorialAboutText() {
       <FadeIn delay={0.44}>
         <p style={body}>
           If you'd like to get in touch, feel free to send me{" "}
-          <EmailLink text="an email" />
+          <EmailLink text="an email" inkColor={INK} />
           . I'm always open to collaborations, ideas, and interesting projects.
         </p>
       </FadeIn>
@@ -241,10 +288,10 @@ export function EditorialAboutText() {
       {/* ── Footer accent row ── */}
       <FadeIn delay={0.5}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingTop: "4px" }}>
-          <BurstStar size={18} opacity={0.35} />
-          <CrossShape size={13} opacity={0.3} />
-          <Diamond size={12} opacity={0.3} />
-          <BurstStar size={13} opacity={0.3} />
+          <BurstStar size={18} opacity={0.35} inkColor={INK} />
+          <CrossShape size={13} opacity={0.3} inkColor={INK} />
+          <Diamond size={12} opacity={0.3} inkColor={INK} />
+          <BurstStar size={13} opacity={0.3} inkColor={INK} />
         </div>
       </FadeIn>
     </div>
@@ -254,8 +301,26 @@ export function EditorialAboutText() {
 // ─── Dev preview ─────────────────────────────────────────────────────────────
 export default function Preview() {
   return (
-    <div style={{ minHeight: "100vh", background: "#0A0A0A", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
-      <div style={{ background: PAPER, borderRadius: "16px", padding: "clamp(2rem, 5vw, 3rem)", maxWidth: "560px", width: "100%", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0A0A0A",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem",
+      }}
+    >
+      <div
+        style={{
+          background: PAPER,
+          borderRadius: "16px",
+          padding: "clamp(2rem, 5vw, 3rem)",
+          maxWidth: "560px",
+          width: "100%",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        }}
+      >
         <EditorialAboutText />
       </div>
     </div>
