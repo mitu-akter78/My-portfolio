@@ -464,6 +464,7 @@ export default function SkillsSection(): React.ReactElement {
 
   return (
     <section
+      id="skills-section"
       ref={sectionRef}
       className="w-full bg-[#0A0A0A] px-6 sm:px-10 md:px-16 lg:px-24 py-20 sm:py-28 lg:py-36 relative overflow-x-clip"
     >

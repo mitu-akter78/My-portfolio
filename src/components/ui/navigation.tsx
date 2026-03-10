@@ -1,449 +1,405 @@
-import React, { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { CustomEase } from "gsap/CustomEase";
+"use client";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(CustomEase);
+import { useState, useMemo, createContext, useContext, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "../../lib/utils";
+
+
+// --- Utilities ---
+function splitText(text: string) {
+  if (!text?.trim()) return { characters: [], characterCount: 0 };
+  const words = text.split(" ").map((w) => w.concat(" "));
+  const characters = words.map((w) => w.split("")).flat(1);
+  return { characters, characterCount: characters.length };
 }
 
-function SplitText({ text, className }: { text: string; className?: string }) {
+function setStaggerDirection({
+  staggerValue = 0.025,
+  totalItems,
+  index,
+}: {
+  staggerValue?: number;
+  totalItems: number;
+  index: number;
+}) {
+  const middleIndex = Math.floor(totalItems / 2);
+  return Math.abs(index - middleIndex) * staggerValue;
+}
+
+function useAnimationVariants(animation: string) {
+  return useMemo(
+    () => ({
+      hidden: {
+        x: animation === "left" ? "-100%" : animation === "right" ? "100%" : 0,
+        y: animation === "top" ? "-120%" : animation === "bottom" ? "120%" : 0,
+        scale: animation === "z" ? 0 : 1,
+        filter: animation === "blur" ? "blur(8px)" : "blur(0px)",
+        opacity: animation === "blur" ? 0 : 1,
+      },
+      visible: { x: 0, y: 0, scale: 1, filter: "blur(0px)", opacity: 1 },
+    }),
+    [animation]
+  );
+}
+
+// --- Context ---
+const HoverCtx = createContext<{ isMouseIn: boolean } | undefined>(undefined);
+const useHoverCtx = () => useContext(HoverCtx);
+
+// --- Stagger Components ---
+function TextStaggerHover({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const [isMouseIn, setIsMouseIn] = useState(false);
   return (
-    <span className={className} aria-hidden="true" style={{ display: "block", whiteSpace: "nowrap" }}>
-      {text.split("").map((char, i) => (
-        <span key={i} className="char" style={{ display: "inline-block" }}>
-          {char === " " ? "\u00A0" : char}
-        </span>
+    <HoverCtx.Provider value={{ isMouseIn }}>
+      <span
+        className={cn("relative inline-block overflow-hidden", className)}
+        onMouseEnter={() => setIsMouseIn(true)}
+        onMouseLeave={() => setIsMouseIn(false)}
+      >
+        {children}
+      </span>
+    </HoverCtx.Provider>
+  );
+}
+
+function TextStaggerHoverActive({
+  animation,
+  children,
+  className = "",
+  transition,
+}: {
+  animation: string;
+  children: React.ReactNode;
+  className?: string;
+  transition?: any;
+}) {
+  const { characters, characterCount } = splitText(String(children));
+  const variants = useAnimationVariants(animation);
+  const ctx = useHoverCtx();
+  const isMouseIn = ctx?.isMouseIn ?? false;
+  return (
+    <span className={cn("inline-block text-nowrap", className)}>
+      {characters.map((char, i) => (
+        <motion.span
+          key={`a-${i}`}
+          className="inline-block"
+          variants={variants}
+          animate={isMouseIn ? "hidden" : "visible"}
+          transition={{
+            delay: setStaggerDirection({ totalItems: characterCount, index: i }),
+            ease: [0.22, 1, 0.36, 1],
+            duration: 0.35,
+            ...transition,
+          }}
+        >
+          {char === " " ? <>&nbsp;</> : char}
+        </motion.span>
       ))}
     </span>
   );
 }
 
-function middleOrder(length: number): number[] {
-  const center = (length - 1) / 2;
-  return Array.from({ length }, (_, i) => i).sort(
-    (a, b) => Math.abs(a - center) - Math.abs(b - center)
+function TextStaggerHoverHidden({
+  animation,
+  children,
+  className = "",
+  transition,
+}: {
+  animation: string;
+  children: React.ReactNode;
+  className?: string;
+  transition?: any;
+}) {
+  const { characters, characterCount } = splitText(String(children));
+  const variants = useAnimationVariants(animation);
+  const ctx = useHoverCtx();
+  const isMouseIn = ctx?.isMouseIn ?? false;
+  return (
+    <span className={cn("inline-block absolute left-0 top-0 text-nowrap", className)}>
+      {characters.map((char, i) => (
+        <motion.span
+          key={`h-${i}`}
+          className="inline-block"
+          variants={variants}
+          animate={isMouseIn ? "visible" : "hidden"}
+          transition={{
+            delay: setStaggerDirection({ totalItems: characterCount, index: i }),
+            ease: [0.22, 1, 0.36, 1],
+            duration: 0.35,
+            ...transition,
+          }}
+        >
+          {char === " " ? <>&nbsp;</> : char}
+        </motion.span>
+      ))}
+    </span>
   );
 }
 
-const socialLinks = [
-  { name: "Twitter", href: "#" },
-  { name: "Instagram", href: "#" },
-  { name: "LinkedIn", href: "#" },
-  { name: "GitHub", href: "#" },
+// --- Nav Data ---
+const navLinks = [
+  { name: "About",   href: "#about-section",   sectionId: "about-section"   },
+  { name: "Skill",   href: "#skills-section",  sectionId: "skills-section"  },
+  { name: "Work",    href: "#projects-section", sectionId: "projects-section" },
+  { name: "Contact", href: "#contact-section", sectionId: "contact-section" },
 ];
 
+
+// --- Main Navigation ---
 export function Navigation() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("home");
-  const didMount = useRef(false);
+  const [isScrolled, setIsScrolled]       = useState(false);
+  const [isVisible, setIsVisible]         = useState(true);
+  const [isOpen, setIsOpen]               = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const navLinks = [
-    { name: "Home",     href: "#",         sectionId: "home"     },
-    { name: "About",    href: "#about",    sectionId: "about"    },
-    { name: "Skills",   href: "#skills",   sectionId: "skills"   },
-    { name: "Projects", href: "#projects", sectionId: "projects" },
-    { name: "Contact",  href: "#contact",  sectionId: "contact"  },
-  ];
-
-  // ── Track active section via IntersectionObserver ──────────────────────
+  // Smart auto-hide: hide on scroll down, reveal on scroll up
   useEffect(() => {
-    const ratioMap: Record<string, number> = {};
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          // FIX: use the sectionId key, not entry.target.id, for the "home" fallback
-          const key = entry.target.dataset.sectionId ?? entry.target.id;
-          ratioMap[key] = entry.intersectionRatio;
-        });
-        const best = Object.entries(ratioMap).sort((a, b) => b[1] - a[1])[0];
-        if (best && best[1] > 0) setActiveSection(best[0]);
-      },
-      {
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-      }
-    );
-
-    navLinks.forEach(({ sectionId }) => {
-      const el =
-        sectionId === "home"
-          ? (document.getElementById("home") ?? document.body)
-          : document.getElementById(sectionId);
-
-      if (el) {
-        // FIX: stamp the logical sectionId onto the element so ratioMap key is
-        // always the sectionId string (handles body fallback where id="" or "")
-        el.dataset.sectionId = sectionId;
-        ratioMap[sectionId] = 0;
-        observer.observe(el);
-      }
-    });
+    let prevScrollY = window.scrollY;
 
     const handleScroll = () => {
-      if (window.scrollY < 80) setActiveSection("home");
+      const curr = window.scrollY;
+      const diff = curr - prevScrollY;
+
+      // Only react if scroll delta exceeds jitter threshold
+      if (Math.abs(diff) > 10) {
+        setIsScrolled(curr > 60);
+        // Always show when near the top, hide when scrolling down
+        setIsVisible(curr < 60 || diff < 0);
+        prevScrollY = curr;
+      }
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", handleScroll);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ── Stagger text hover ─────────────────────────────────────────────────
-  // NOTE: No gsap.context() here — same reason as the menu effect.
-  // ctx.revert() would undo the gsap.set() calls inside snapToRest (the
-  // initial yPercent:105 / clearProps state), causing hidden chars to snap
-  // back to their natural visible CSS state. That ghost state then wins after
-  // any hover animation completes, making text appear to vanish.
-  // We clean up manually: kill all tweens and remove event listeners.
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
-    if (!containerRef.current) return;
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
 
-    try { CustomEase.create("smooth", "0.76, 0, 0.24, 1"); } catch (_) {}
-
-    const navLinkEls = Array.from(
-      containerRef.current.querySelectorAll(".nav-link")
-    ) as HTMLElement[];
-
-    type LinkData = {
-      el: HTMLElement;
-      activeChars: HTMLElement[];
-      hiddenChars: HTMLElement[];
-      order: number[];
-      activeTl: gsap.core.Timeline | null;
-    };
-
-    const linkDataList: LinkData[] = navLinkEls.map((link) => {
-      const activeEl    = link.querySelector(".nav-link-active")!;
-      const hiddenEl    = link.querySelector(".nav-link-hidden")!;
-      const activeChars = Array.from(activeEl.querySelectorAll(".char")) as HTMLElement[];
-      const hiddenChars = Array.from(hiddenEl.querySelectorAll(".char")) as HTMLElement[];
-      return { el: link, activeChars, hiddenChars, order: middleOrder(activeChars.length), activeTl: null };
-    });
-
-    const DURATION = 0.48;
-    const STAGGER  = 0.016;
-    const EASE_OUT = "smooth";
-    const EASE_IN  = "power2.in";
-
-    // snapToRest: kill tweens and immediately apply resting state.
-    // These gsap calls are intentionally outside any context so they are
-    // never auto-reverted by a ctx.revert() call.
-    const snapToRest = (data: LinkData) => {
-      data.activeTl?.kill();
-      data.activeTl = null;
-      gsap.killTweensOf([...data.activeChars, ...data.hiddenChars]);
-      gsap.set(data.activeChars, { clearProps: "all" });
-      gsap.set(data.hiddenChars, { yPercent: 105, opacity: 0 });
-    };
-
-    const animateIn = (data: LinkData) => {
-      data.activeTl?.kill();
-      gsap.killTweensOf([...data.activeChars, ...data.hiddenChars]);
-      const tl = gsap.timeline({
-        onComplete: () => {
-          // Lock final state explicitly so nothing can disturb it
-          gsap.set(data.activeChars, { yPercent: -105, opacity: 0 });
-          gsap.set(data.hiddenChars, { yPercent: 0, opacity: 1 });
-        },
-      });
-      data.activeTl = tl;
-      tl.to(
-        data.order.map((i) => data.activeChars[i]),
-        { yPercent: -105, opacity: 0, duration: DURATION, stagger: STAGGER, ease: EASE_IN },
-        0
-      );
-      tl.fromTo(
-        data.order.map((i) => data.hiddenChars[i]),
-        { yPercent: 105, opacity: 0 },
-        { yPercent: 0, opacity: 1, duration: DURATION, stagger: STAGGER, ease: EASE_OUT },
-        0.03
-      );
-    };
-
-    const animateOut = (data: LinkData) => {
-      data.activeTl?.kill();
-      gsap.killTweensOf([...data.activeChars, ...data.hiddenChars]);
-      const tl = gsap.timeline({
-        onComplete: () => {
-          // Lock final state explicitly
-          gsap.set(data.hiddenChars, { yPercent: 105, opacity: 0 });
-          gsap.set(data.activeChars, { clearProps: "all" });
-        },
-      });
-      data.activeTl = tl;
-      tl.to(
-        data.order.map((i) => data.hiddenChars[i]),
-        { yPercent: 105, opacity: 0, duration: DURATION, stagger: STAGGER, ease: EASE_IN },
-        0
-      );
-      tl.fromTo(
-        data.order.map((i) => data.activeChars[i]),
-        { yPercent: -105, opacity: 0 },
-        { yPercent: 0, opacity: 1, duration: DURATION, stagger: STAGGER, ease: EASE_OUT },
-        0.03
-      );
-    };
-
-    // Set initial resting state for all links
-    linkDataList.forEach(snapToRest);
-
-    // Attach event listeners
-    linkDataList.forEach((data) => {
-      const onEnter = () => {
-        linkDataList.forEach((other) => {
-          if (other !== data) snapToRest(other);
-        });
-        animateIn(data);
-      };
-      const onLeave = () => animateOut(data);
-      const onClick = () => snapToRest(data);
-
-      data.el.addEventListener("mouseenter", onEnter);
-      data.el.addEventListener("mouseleave", onLeave);
-      data.el.addEventListener("click",      onClick);
-
-      (data.el as any)._hoverCleanup = () => {
-        data.activeTl?.kill();
-        data.activeTl = null;
-        gsap.killTweensOf([...data.activeChars, ...data.hiddenChars]);
-        data.el.removeEventListener("mouseenter", onEnter);
-        data.el.removeEventListener("mouseleave", onLeave);
-        data.el.removeEventListener("click",      onClick);
-      };
-    });
-
-    return () => {
-      containerRef.current
-        ?.querySelectorAll(".nav-link")
-        .forEach((link: any) => link._hoverCleanup?.());
-    };
+  // Sort by intersectionRatio so the most-visible section always wins
+  useEffect(() => {
+    const sections = navLinks.map((l) => document.querySelector(l.href));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible.length > 0) {
+          setActiveSection("#" + visible[0].target.id);
+        }
+      },
+      { rootMargin: "-20% 0px -60% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+    sections.forEach((s) => s && observer.observe(s));
+    return () => observer.disconnect();
   }, []);
 
-  // ── Menu open / close ─────────────────────────────────────────────────
-  // IMPORTANT: we deliberately avoid gsap.context() + ctx.revert() here.
-  // ctx.revert() would undo the char hard-resets (clearProps / yPercent:105)
-  // made at open-time, restoring chars to whatever mid-hover state they held
-  // (e.g. yPercent:-105, opacity:0) and leaving them stuck invisible behind
-  // the overflow:hidden clip. Using tl.kill() instead stops in-flight tweens
-  // without touching any already-applied values.
-  const menuTlRef = useRef<gsap.core.Timeline | null>(null);
-
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (!containerRef.current) return;
-
-    // Kill previous timeline without reverting its applied values
-    menuTlRef.current?.kill();
-
-    const navWrap        = containerRef.current.querySelector(".nav-overlay-wrapper");
-    const menu           = containerRef.current.querySelector(".menu-content");
-    const overlay        = containerRef.current.querySelector(".overlay");
-    const bgPanels       = containerRef.current.querySelectorAll(".backdrop-layer");
-    const menuLinks      = containerRef.current.querySelectorAll(".nav-link");
-    const inMenuCloseBtn = containerRef.current.querySelector(".menu-inner-close");
-    const menuFooter     = containerRef.current.querySelector(".menu-footer");
-
-    const tl = gsap.timeline();
-    menuTlRef.current = tl;
-
-    if (isMenuOpen) {
-      navWrap?.setAttribute("data-nav", "open");
-
-      // Kill any in-flight char tweens from hover animations
-      menuLinks.forEach((link) => {
-        gsap.killTweensOf(link.querySelectorAll(".char"));
-      });
-
-      // Hard-reset char states. These gsap.set() calls are intentionally
-      // outside any context so they are never auto-reverted.
-      menuLinks.forEach((link) => {
-        const activeChars = Array.from(link.querySelectorAll(".nav-link-active .char")) as HTMLElement[];
-        const hiddenChars = Array.from(link.querySelectorAll(".nav-link-hidden .char")) as HTMLElement[];
-        gsap.set(activeChars, { clearProps: "all" });
-        gsap.set(hiddenChars, { yPercent: 105, opacity: 0 });
-      });
-
-      tl.set(navWrap, { display: "flex" })
-        .set(menu, { xPercent: 0 }, "<")
-        .set(inMenuCloseBtn, { autoAlpha: 0, y: -6 }, "<")
-        .set(menuFooter, { autoAlpha: 0, y: 10 }, "<")
-        .fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1 }, "<")
-        .fromTo(bgPanels,
-          { xPercent: 101 },
-          { xPercent: 0, stagger: 0.1, duration: 0.55, ease: "power3.out" },
-          "<"
-        )
-        .fromTo(menuLinks,
-          { yPercent: 30, opacity: 0 },
-          {
-            yPercent: 0, opacity: 1,
-            stagger: 0.06, duration: 0.5,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          },
-          "<+=0.25"
-        )
-        .to(inMenuCloseBtn,
-          { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out" },
-          "<+=0.1"
-        )
-        .to(menuFooter,
-          { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" },
-          "<+=0.05"
-        );
-    } else {
-      navWrap?.setAttribute("data-nav", "closed");
-      tl.to([overlay, menuFooter, inMenuCloseBtn], { autoAlpha: 0, duration: 0.2 })
-        .to(menu, { xPercent: 120, duration: 0.4, ease: "power3.in" }, "<")
-        .set(navWrap, { display: "none" });
-    }
-
-    return () => { tl.kill(); };
-  }, [isMenuOpen]);
-
-  // ── Escape key ────────────────────────────────────────────────────────
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isMenuOpen) setIsMenuOpen(false);
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [isMenuOpen]);
-
-  const toggleMenu = () => setIsMenuOpen((p) => !p);
-  const closeMenu  = () => setIsMenuOpen(false);
+  const toggleMenu = () => setIsOpen((v) => !v);
 
   return (
     <>
-      <div ref={containerRef}>
-        {/* ── Header ── */}
-        <div className="site-header-wrapper">
-          <header className="header">
-            <div className="nav-container">
-              <nav className="nav-row">
-                <a href="#" aria-label="home" className="nav-logo">
-                  <span className="nav-logo-text">Sadia.</span>
-                </a>
-                <div className="nav-row__right">
-                  <button
-                    className="nav-close-btn"
-                    onClick={toggleMenu}
-                    aria-label="Toggle menu"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      className="menu-button-icon"
-                    >
-                      <line x1="3"  y1="6"  x2="21" y2="6"  />
-                      <line x1="3"  y1="12" x2="21" y2="12" />
-                      <line x1="3"  y1="18" x2="21" y2="18" />
-                    </svg>
-                  </button>
-                </div>
-              </nav>
+      {/* Full-screen mobile overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="mobile-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[99] md:hidden"
+            style={{ background: "rgba(4, 4, 6, 0.97)" }}
+          >
+            {/* Decorative grid lines */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-[0.04]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
+                backgroundSize: "80px 80px",
+              }}
+            />
+
+            {/* Corner accent */}
+            <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none overflow-hidden opacity-20">
+              <div
+                className="absolute top-0 right-0 w-full h-full"
+                style={{
+                  background:
+                    "radial-gradient(circle at top right, rgba(255,255,255,0.3), transparent 70%)",
+                }}
+              />
             </div>
-          </header>
-        </div>
 
-        {/* ── Fullscreen menu ── */}
-        {/* FIX: hide overlay wrapper on initial render so it doesn't flash visible */}
-        <section className="fullscreen-menu-container">
-          <div data-nav="closed" className="nav-overlay-wrapper" style={{ display: "none" }}>
-            <div className="overlay" onClick={closeMenu} />
-
-            <nav className="menu-content">
-              {/* Backdrop layers */}
-              <div className="menu-bg">
-                <div className="backdrop-layer first"  />
-                <div className="backdrop-layer second" />
-                <div className="backdrop-layer"        />
-              </div>
-
-              {/* Top-right close X */}
-              <div className="menu-header">
-                <button
-                  className="menu-inner-close"
-                  onClick={closeMenu}
-                  aria-label="Close menu"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 13 13"
-                    fill="none"
+            {/* Nav items */}
+            <div className="flex flex-col justify-center h-full px-8 pb-16">
+              <div className="space-y-1">
+                {navLinks.map((link, i) => (
+                  <motion.div
+                    key={link.name}
+                    initial={{ opacity: 0, x: -40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{
+                      delay: 0.1 + i * 0.07,
+                      duration: 0.6,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="group"
                   >
-                    <path
-                      d="M1.5 1.5L11.5 11.5M11.5 1.5L1.5 11.5"
-                      stroke="currentColor"
-                      strokeWidth="1.75"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Nav links — centered */}
-              <div className="menu-content-wrapper">
-                <ul className="menu-list">
-                  {navLinks.map((link, i) => (
-                    <li
-                      key={i}
-                      className={`menu-list-item${activeSection === link.sectionId ? " is-active" : ""}`}
-                    >
-                      <a
-                        href={link.href}
-                        className="nav-link"
-                        onClick={closeMenu}
-                      >
-                        <div className="nav-link-text-wrapper">
-                          <SplitText
-                            text={link.name}
-                            className="nav-link-active nav-link-text"
-                          />
-                          <SplitText
-                            text={link.name}
-                            className="nav-link-hidden nav-link-text"
-                          />
-                        </div>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Bottom footer: CTA + socials */}
-              <div className="menu-footer">
-                <div className="menu-social-links">
-                  {socialLinks.map((s, i) => (
                     <a
-                      key={i}
-                      href={s.href}
-                      className="menu-social-link"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-baseline gap-4 py-3 border-b border-white/[0.06] no-underline"
                     >
-                      {s.name}
+                      <span className="text-white/20 font-mono text-xs tracking-wider mt-1">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span
+                        className="text-white font-playfair text-5xl sm:text-6xl tracking-tight leading-none transition-all duration-500 group-hover:tracking-wider group-hover:text-white/60"
+                        style={{ fontWeight: 300 }}
+                      >
+                        {link.name}
+                      </span>
                     </a>
-                  ))}
-                </div>
+                  </motion.div>
+                ))}
               </div>
+
+              {/* Bottom label */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.55, duration: 0.8 }}
+                className="absolute bottom-10 left-8 text-white/20 text-[10px] tracking-[0.35em] uppercase font-mono"
+              >
+                sadia.dev
+              </motion.p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Header ── */}
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{
+          y: isVisible ? 0 : -100,
+          opacity: isVisible ? 1 : 0,
+        }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className={cn(
+          "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+          isScrolled ? "py-3 px-4 md:px-8" : "py-0 px-0"
+        )}
+      >
+        {/* Inner pill */}
+        <div
+          className={cn(
+            "mx-auto transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] border",
+            isScrolled
+              ? "max-w-5xl glass-strong rounded-full px-6 py-1 shadow-lg border-white/20"
+              : "max-w-7xl px-6 sm:px-10 md:px-16 lg:px-24 rounded-none border-transparent"
+          )}
+        >
+          <div
+            className={cn(
+              "flex items-center justify-between transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+              isScrolled ? "h-11" : "h-[88px]"
+            )}
+          >
+            {/* Logo */}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="group flex items-center no-underline"
+            >
+              <span
+                className="text-white font-playfair text-xl font-light tracking-[0.4em] transition-all duration-300 group-hover:tracking-[0.5em] group-hover:opacity-70"
+                style={{ fontVariant: "small-caps" }}
+              >
+                sadia
+              </span>
+            </a>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-8">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href;
+                return (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="relative text-white font-playfair text-[13px] tracking-[0.18em] uppercase no-underline font-medium"
+                  >
+                    <TextStaggerHover>
+                      <TextStaggerHoverActive
+                        animation="top"
+                        className={cn(
+                          "transition-opacity duration-300",
+                          isActive ? "opacity-100" : "opacity-50"
+                        )}
+                      >
+                        {link.name}
+                      </TextStaggerHoverActive>
+                      <TextStaggerHoverHidden animation="bottom">
+                        {link.name}
+                      </TextStaggerHoverHidden>
+                    </TextStaggerHover>
+
+                    {/* Active dot */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="nav-active-dot"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[3px] h-[3px] rounded-full bg-white"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </a>
+                );
+              })}
             </nav>
+
+            {/* Mobile Toggle */}
+            <button
+              onClick={toggleMenu}
+              className="md:hidden flex items-center justify-center w-9 h-9 relative focus:outline-none z-[101]"
+              aria-label="Toggle menu"
+              aria-expanded={isOpen}
+            >
+              <div className="relative w-5 h-4 flex flex-col justify-between">
+                <motion.span
+                  animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="block h-[1.5px] bg-white rounded-full origin-left"
+                />
+                <motion.span
+                  animate={isOpen ? { opacity: 0, x: 8 } : { opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="block h-[1.5px] bg-white rounded-full w-3/4"
+                />
+                <motion.span
+                  animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="block h-[1.5px] bg-white rounded-full origin-left"
+                />
+              </div>
+            </button>
           </div>
-        </section>
-      </div>
+        </div>
+      </motion.header>
     </>
   );
 }

@@ -271,7 +271,7 @@ const Contact = () => {
             `}</style>
 
             <section
-                id="contact"
+                id="contact-section"
                 ref={sectionRef}
                 className="contact-section"
                 onMouseMove={handleMouseMove}

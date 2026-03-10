@@ -239,6 +239,7 @@ export default function About() {
 
   return (
     <section
+      id="about-section"
       ref={sectionRef}
       style={{ position: 'relative', width: '100%', minHeight: '100svh', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'clip', overflowY: 'visible' }}
     >
