@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types ─────────────────────────────────────────────────────────────────────
 
 interface TechStack {
   id: number;
@@ -37,26 +37,163 @@ interface DesktopCardProps {
   width: string;
 }
 
-interface FloatShapeProps {
-  children: React.ReactNode;
-  x: string;
-  y: string;
-  delay?: number;
-  duration?: number;
-  amplitude?: number;
-  rotate?: number;
-  opacity?: number;
-}
-
-interface BgStarProps {
+interface TechLogoProps {
   x: string;
   y: string;
   size?: number;
   opacity?: number;
   delay?: number;
+  duration?: number;
+  rotateDir?: 1 | -1;
+  floatAmplitude?: number;
+  logo: LogoKey;
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+type LogoKey =
+  | "react" | "typescript" | "nodejs" | "docker" | "figma"
+  | "git" | "nextjs" | "tailwind" | "postgresql" | "threejs"
+  | "rust" | "vercel";
+
+// ─── Logo SVGs ─────────────────────────────────────────────────────────────────
+
+const logoSVGs: Record<LogoKey, (size: number) => React.ReactElement> = {
+  react: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <ellipse cx="50" cy="50" rx="46" ry="18" stroke="currentColor" strokeWidth="4" />
+      <ellipse cx="50" cy="50" rx="46" ry="18" stroke="currentColor" strokeWidth="4" transform="rotate(60 50 50)" />
+      <ellipse cx="50" cy="50" rx="46" ry="18" stroke="currentColor" strokeWidth="4" transform="rotate(120 50 50)" />
+      <circle cx="50" cy="50" r="6" fill="currentColor" />
+    </svg>
+  ),
+  typescript: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <rect x="8" y="8" width="84" height="84" rx="10" stroke="currentColor" strokeWidth="4" />
+      <path d="M22 40 H78 M50 40 V80" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+      <path d="M60 58 C60 52 68 52 68 58 C68 66 58 66 58 74 H70" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  nodejs: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <path d="M50 10 L88 32 L88 68 L50 90 L12 68 L12 32 Z" stroke="currentColor" strokeWidth="4" />
+      <path d="M35 37 C35 28 65 28 65 37 C65 47 50 47 50 47 C50 47 65 47 65 57 C65 67 35 67 35 63" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  ),
+  docker: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <rect x="14" y="35" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="3.5" />
+      <rect x="30" y="35" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="3.5" />
+      <rect x="46" y="35" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="3.5" />
+      <rect x="30" y="21" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="3.5" />
+      <rect x="46" y="21" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="3.5" />
+      <path d="M8 53 C8 53 12 42 30 45 C32 36 40 35 52 38 C60 28 75 32 78 40 C88 40 94 48 90 56 C88 62 80 64 66 64 L20 64 C12 64 6 60 8 53Z" stroke="currentColor" strokeWidth="3.5" />
+    </svg>
+  ),
+  figma: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <rect x="26" y="10" width="24" height="24" rx="12" stroke="currentColor" strokeWidth="4" />
+      <rect x="50" y="10" width="24" height="24" rx="12" stroke="currentColor" strokeWidth="4" />
+      <rect x="26" y="34" width="24" height="24" stroke="currentColor" strokeWidth="4" />
+      <rect x="26" y="58" width="24" height="24" stroke="currentColor" strokeWidth="4" />
+      <circle cx="62" cy="46" r="12" stroke="currentColor" strokeWidth="4" />
+    </svg>
+  ),
+  git: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <rect x="10" y="10" width="80" height="80" rx="16" stroke="currentColor" strokeWidth="4" />
+      <circle cx="33" cy="38" r="7" stroke="currentColor" strokeWidth="3.5" />
+      <circle cx="33" cy="62" r="7" stroke="currentColor" strokeWidth="3.5" />
+      <circle cx="67" cy="38" r="7" stroke="currentColor" strokeWidth="3.5" />
+      <path d="M33 45 L33 55" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M33 45 C33 54 40 57 60 45" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+    </svg>
+  ),
+  nextjs: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="4" />
+      <path d="M32 68 L32 32 L72 68" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M55 52 L72 32" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+    </svg>
+  ),
+  tailwind: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <path d="M20 50 C20 35 28 28 42 31 C46 20 54 14 68 17 C62 31 58 38 44 37 C40 48 36 54 20 50Z" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M44 68 C44 53 52 46 66 49 C70 38 78 32 92 35 C86 49 82 56 68 55 C64 66 60 72 44 68Z" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+    </svg>
+  ),
+  postgresql: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <ellipse cx="50" cy="28" rx="32" ry="14" stroke="currentColor" strokeWidth="4" />
+      <path d="M18 28 L18 58 M82 28 L82 58" stroke="currentColor" strokeWidth="4" />
+      <ellipse cx="50" cy="58" rx="32" ry="14" stroke="currentColor" strokeWidth="4" />
+      <ellipse cx="50" cy="43" rx="32" ry="14" stroke="currentColor" strokeWidth="4" strokeDasharray="6 4" />
+      <path d="M65 58 L65 80 C65 86 56 88 50 85" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  ),
+  threejs: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <polygon points="50,10 92,80 8,80" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+      <polygon points="50,32 74,74 26,74" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
+      <line x1="50" y1="10" x2="50" y2="32" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <line x1="8" y1="80" x2="26" y2="74" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <line x1="92" y1="80" x2="74" y2="74" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  ),
+  rust: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="4" />
+      <circle cx="50" cy="50" r="10" stroke="currentColor" strokeWidth="3.5" />
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+        <line
+          key={i}
+          x1={50 + 10 * Math.cos((angle * Math.PI) / 180)}
+          y1={50 + 10 * Math.sin((angle * Math.PI) / 180)}
+          x2={50 + 28 * Math.cos((angle * Math.PI) / 180)}
+          y2={50 + 28 * Math.sin((angle * Math.PI) / 180)}
+          stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"
+        />
+      ))}
+      <polygon points="18,38 24,44 18,50" fill="currentColor" />
+      <polygon points="82,50 76,44 82,38" fill="currentColor" />
+    </svg>
+  ),
+  vercel: (s) => (
+    <svg width={s} height={s} viewBox="0 0 100 100" fill="none">
+      <path d="M50 15 L88 80 L12 80 Z" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+    </svg>
+  ),
+};
+
+// ─── TechLogo ──────────────────────────────────────────────────────────────────
+
+const TechLogo: React.FC<TechLogoProps> = ({
+  x, y, size = 48, opacity = 0.055, delay = 0,
+  duration = 22, rotateDir = 1, floatAmplitude = 10, logo,
+}) => (
+  <motion.div
+    aria-hidden="true"
+    style={{
+      position: "absolute",
+      left: x,
+      top: y,
+      pointerEvents: "none",
+      userSelect: "none",
+      color: "#F2F0EB",
+      opacity,
+    }}
+    animate={{
+      rotate: [0, 360 * rotateDir],
+      y: [0, -floatAmplitude, 0],
+    }}
+    transition={{
+      rotate: { duration, delay, repeat: Infinity, ease: "linear" },
+      y: { duration: duration * 0.28, delay, repeat: Infinity, ease: "easeInOut" },
+    }}
+  >
+    {logoSVGs[logo](size)}
+  </motion.div>
+);
+
+// ─── Data ──────────────────────────────────────────────────────────────────────
 
 const techStacks: TechStack[] = [
   {
@@ -106,112 +243,100 @@ const techStacks: TechStack[] = [
   },
 ];
 
-/* ─── Mobile Card ──────────────────────────────────────────────────────────── */
+// ─── Mobile Card ───────────────────────────────────────────────────────────────
 
-const MobileCard: React.FC<MobileCardProps> = ({ stack, isExpanded, onClick }) => {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        width: "100%",
-        background: "#080808",
-        borderRadius: "1rem",
-        overflow: "hidden",
-        cursor: "pointer",
-        position: "relative",
-      }}
-    >
-      {/* Bg gradients */}
-      <div style={{ position: "absolute", inset: 0, background: stack.gradient, opacity: 0.9, pointerEvents: "none" }} />
-      <div style={{ position: "absolute", inset: 0, background: stack.accentGradient, opacity: 0.7, pointerEvents: "none" }} />
-      {/* Grain */}
-      <div style={{
-        position: "absolute", inset: "-50%", width: "200%", height: "200%",
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E")`,
-        backgroundRepeat: "repeat", backgroundSize: "150px 150px",
-        opacity: 0.4, pointerEvents: "none", mixBlendMode: "screen",
-      }} />
+const MobileCard: React.FC<MobileCardProps> = ({ stack, isExpanded, onClick }) => (
+  <div
+    onClick={onClick}
+    style={{
+      width: "100%",
+      background: "#080808",
+      borderRadius: "1rem",
+      overflow: "hidden",
+      cursor: "pointer",
+      position: "relative",
+      border: "1px solid rgba(255,255,255,0.06)",
+    }}
+  >
+    <div style={{ position: "absolute", inset: 0, background: stack.gradient, opacity: 0.9, pointerEvents: "none" }} />
+    <div style={{ position: "absolute", inset: 0, background: stack.accentGradient, opacity: 0.7, pointerEvents: "none" }} />
+    {/* Noise */}
+    <div style={{
+      position: "absolute", inset: 0,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E")`,
+      backgroundSize: "180px 180px",
+      opacity: 0.35,
+      mixBlendMode: "screen",
+      pointerEvents: "none",
+    }} />
 
-      {/* Header row */}
-      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.1rem 1.4rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.6rem", letterSpacing: "0.15em", color: "rgba(255,255,255,0.25)" }}>
-            {stack.number}
-          </span>
-          <span style={{ fontFamily: "'Georgia', serif", fontSize: "1rem", fontWeight: 400, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.01em" }}>
-            {stack.category}{" "}
-            <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.88rem" }}>{stack.subtitle}</span>
-          </span>
-        </div>
-
-        {/* +/× icon */}
-        <div style={{
-          width: 22, height: 22,
-          border: `1px solid ${isExpanded ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.15)"}`,
-          borderRadius: "50%",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          flexShrink: 0,
-          transition: "transform 0.35s ease, border-color 0.35s ease",
-          transform: isExpanded ? "rotate(45deg)" : "rotate(0deg)",
-        }}>
-          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-            <line x1="4.5" y1="0.5" x2="4.5" y2="8.5" stroke="rgba(255,255,255,0.55)" strokeWidth="1.2" strokeLinecap="round" />
-            <line x1="0.5" y1="4.5" x2="8.5" y2="4.5" stroke="rgba(255,255,255,0.55)" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
-        </div>
+    <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.1rem 1.4rem" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.6rem", letterSpacing: "0.15em", color: "rgba(255,255,255,0.22)" }}>
+          {stack.number}
+        </span>
+        <span style={{ fontFamily: "'Georgia', serif", fontSize: "1rem", fontWeight: 400, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.01em" }}>
+          {stack.category}{" "}
+          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.88rem" }}>{stack.subtitle}</span>
+        </span>
       </div>
+      <div style={{
+        width: 22, height: 22,
+        border: `1px solid ${isExpanded ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.14)"}`,
+        borderRadius: "50%",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+        transition: "transform 0.35s ease, border-color 0.35s ease",
+        transform: isExpanded ? "rotate(45deg)" : "rotate(0deg)",
+      }}>
+        <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+          <line x1="4.5" y1="0.5" x2="4.5" y2="8.5" stroke="rgba(255,255,255,0.55)" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="0.5" y1="4.5" x2="8.5" y2="4.5" stroke="rgba(255,255,255,0.55)" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      </div>
+    </div>
 
-      {/*
-        ── Smooth accordion via CSS grid rows trick ──────────────────────────
-        grid-template-rows: 0fr → 1fr  animates the actual track size,
-        giving a physically correct squish with no max-height clamping.
-        The inner div needs overflow:hidden + min-height:0 to participate.
-      */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: isExpanded ? "1fr" : "0fr",
-          transition: "grid-template-rows 0.42s cubic-bezier(0.4, 0, 0.2, 1)",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <div style={{ overflow: "hidden", minHeight: 0 }}>
-          <div style={{ padding: "0.75rem 1.4rem 1.3rem 1.4rem", display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
-            {stack.skills.map((skill: string, i: number) => (
-              <span
-                key={skill}
-                style={{
-                  fontFamily: "'Courier New', monospace",
-                  fontSize: "0.72rem",
-                  color: "rgba(255,255,255,0.6)",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  borderRadius: "5px",
-                  padding: "0.3rem 0.65rem",
-                  letterSpacing: "0.04em",
-                  opacity: isExpanded ? 1 : 0,
-                  transition: `opacity 0.25s ease ${0.12 + i * 0.05}s`,
-                }}
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
+    <div style={{
+      display: "grid",
+      gridTemplateRows: isExpanded ? "1fr" : "0fr",
+      transition: "grid-template-rows 0.42s cubic-bezier(0.4,0,0.2,1)",
+      position: "relative", zIndex: 1,
+    }}>
+      <div style={{ overflow: "hidden", minHeight: 0 }}>
+        <div style={{ padding: "0.75rem 1.4rem 1.3rem", display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+          {stack.skills.map((skill, i) => (
+            <span
+              key={skill}
+              style={{
+                fontFamily: "'Courier New', monospace",
+                fontSize: "0.72rem",
+                color: "rgba(255,255,255,0.6)",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                borderRadius: "5px",
+                padding: "0.3rem 0.65rem",
+                letterSpacing: "0.04em",
+                opacity: isExpanded ? 1 : 0,
+                transition: `opacity 0.25s ease ${0.12 + i * 0.05}s`,
+              }}
+            >
+              {skill}
+            </span>
+          ))}
         </div>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
-/* ─── Desktop Card ─────────────────────────────────────────────────────────── */
+// ─── Desktop Card ──────────────────────────────────────────────────────────────
 
 const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnter, width }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [spotlight, setSpotlight] = useState<SpotlightState>({ x: 50, y: 50, opacity: 0 });
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>): void => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     setSpotlight({
@@ -230,49 +355,48 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
         background: "#080808",
         borderRadius: "1.5rem",
         flexShrink: 0,
-        transition: "width 0.5s ease",
+        transition: "width 0.5s cubic-bezier(0.4,0,0.2,1)",
         position: "relative",
         overflow: "hidden",
         cursor: "pointer",
+        border: "1px solid rgba(255,255,255,0.06)",
       }}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => {
-        setIsHovered(true);
-        setSpotlight((s) => ({ ...s, opacity: 1 }));
-        onMouseEnter();
-      }}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setSpotlight((s) => ({ ...s, opacity: 0 }));
-      }}
+      onMouseEnter={() => { setIsHovered(true); setSpotlight(s => ({ ...s, opacity: 1 })); onMouseEnter(); }}
+      onMouseLeave={() => { setIsHovered(false); setSpotlight(s => ({ ...s, opacity: 0 })); }}
     >
       <div style={{ position: "absolute", inset: 0, background: stack.gradient, opacity: 0.8, pointerEvents: "none" }} />
       <div style={{ position: "absolute", inset: 0, background: stack.accentGradient, opacity: 0.6, pointerEvents: "none" }} />
-      <div style={{
-        position: "absolute", inset: "-50%", width: "200%", height: "200%",
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E")`,
-        backgroundRepeat: "repeat", backgroundSize: "150px 150px",
-        opacity: 0.4, pointerEvents: "none", mixBlendMode: "screen",
-      }} />
+      {/* Noise layer */}
       <div style={{
         position: "absolute", inset: 0,
-        background: `radial-gradient(circle 160px at ${spotlight.x}% ${spotlight.y}%, rgba(255,255,255,0.06) 0%, transparent 80%)`,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E")`,
+        backgroundSize: "180px 180px",
+        opacity: 0.35,
+        mixBlendMode: "screen",
+        pointerEvents: "none",
+      }} />
+      {/* Spotlight */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: `radial-gradient(circle 160px at ${spotlight.x}% ${spotlight.y}%, rgba(255,255,255,0.07) 0%, transparent 80%)`,
         opacity: spotlight.opacity, transition: "opacity 0.3s ease", pointerEvents: "none",
       }} />
+      {/* Sheen */}
       <div style={{
-        position: "absolute", top: 0, left: "-10%", width: "60%", height: "100%",
-        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent)",
-        transform: isHovered ? "translateX(300%) skewX(-15deg)" : "translateX(-200%) skewX(-15deg)",
-        transition: isHovered ? "transform 3s ease" : "none",
+        position: "absolute", top: 0, left: "-10%", width: "55%", height: "100%",
+        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.035), transparent)",
+        transform: isHovered ? "translateX(360%) skewX(-15deg)" : "translateX(-250%) skewX(-15deg)",
+        transition: isHovered ? "transform 3.2s ease" : "none",
         pointerEvents: "none",
       }} />
 
       <div style={{ position: "relative", zIndex: 10, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "2rem 1.5rem", color: "white" }}>
-        <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.65rem", letterSpacing: "0.15em", color: "rgba(255,255,255,0.3)" }}>
+        <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.62rem", letterSpacing: "0.18em", color: "rgba(255,255,255,0.25)" }}>
           {stack.number}
         </span>
 
-        {/* Collapsed vertical label */}
+        {/* Collapsed label */}
         <div style={{
           position: "absolute", top: "50%", left: "50%",
           transform: "translate(-50%, -50%) rotate(-90deg)",
@@ -281,7 +405,7 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
           transition: "opacity 0.2s ease",
           pointerEvents: "none",
         }}>
-          <span style={{ fontFamily: "'Georgia', serif", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)" }}>
+          <span style={{ fontFamily: "'Georgia', serif", fontSize: "0.72rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
             {stack.category}
           </span>
         </div>
@@ -294,15 +418,15 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
           transition: "opacity 0.35s ease 0.15s, transform 0.35s ease 0.15s",
         }}>
           <div>
-            <p style={{ fontFamily: "'Courier New', monospace", fontSize: "0.58rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: "0.4rem" }}>
+            <p style={{ fontFamily: "'Courier New', monospace", fontSize: "0.55rem", letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.28)", marginBottom: "0.4rem" }}>
               {stack.subtitle}
             </p>
             <h2 style={{ fontFamily: "'Georgia', serif", fontSize: "1.75rem", fontWeight: 400, lineHeight: 1.1, color: "rgba(255,255,255,0.93)", letterSpacing: "-0.02em" }}>
               {stack.category}
             </h2>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-            {stack.skills.map((skill: string, i: number) => (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.48rem" }}>
+            {stack.skills.map((skill, i) => (
               <div
                 key={skill}
                 style={{
@@ -312,8 +436,8 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
                   transition: `opacity 0.3s ease ${0.2 + i * 0.07}s, transform 0.3s ease ${0.2 + i * 0.07}s`,
                 }}
               >
-                <div style={{ width: 4, height: 4, borderRadius: "50%", background: "rgba(255,255,255,0.45)", flexShrink: 0 }} />
-                <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.78rem", color: "rgba(255,255,255,0.65)", letterSpacing: "0.04em" }}>
+                <div style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(255,255,255,0.4)", flexShrink: 0 }} />
+                <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.78rem", color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
                   {skill}
                 </span>
               </div>
@@ -321,10 +445,9 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: isExpanded ? 1 : 0, transition: "opacity 0.3s ease 0.4s" }}>
-          <div style={{ width: 20, height: 1, background: "rgba(255,255,255,0.2)" }} />
-          <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.52rem", letterSpacing: "0.25em", color: "rgba(255,255,255,0.2)", textTransform: "uppercase" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: isExpanded ? 1 : 0, transition: "opacity 0.3s ease 0.42s" }}>
+          <div style={{ width: 18, height: 1, background: "rgba(255,255,255,0.18)" }} />
+          <span style={{ fontFamily: "'Courier New', monospace", fontSize: "0.5rem", letterSpacing: "0.28em", color: "rgba(255,255,255,0.2)", textTransform: "uppercase" }}>
             Stack {stack.number}
           </span>
         </div>
@@ -333,29 +456,28 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
   );
 };
 
-/* ─── ExpandOnHover ──────────────────────────────────────────────────────────── */
+// ─── ExpandOnHover ─────────────────────────────────────────────────────────────
 
 const ExpandOnHover: React.FC = () => {
-  const [isMobile, setIsMobile] = useState<boolean>(() =>
+  const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
-  const [expandedIndex, setExpandedIndex] = useState<number>(() =>
+  const [expandedIndex, setExpandedIndex] = useState(() =>
     typeof window !== "undefined" && window.innerWidth >= 768 ? 3 : -1
   );
 
   useEffect(() => {
-    const check = (): void => {
+    const check = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (!mobile) setExpandedIndex((prev) => (prev === -1 ? 3 : prev));
+      if (!mobile) setExpandedIndex(p => p === -1 ? 3 : p);
       if (mobile) setExpandedIndex(-1);
     };
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const getCardWidth = (index: number): string =>
-    index === expandedIndex ? "24rem" : "5rem";
+  const getCardWidth = (index: number) => index === expandedIndex ? "24rem" : "5rem";
 
   if (isMobile) {
     return (
@@ -365,14 +487,13 @@ const ExpandOnHover: React.FC = () => {
             key={stack.id}
             stack={stack}
             isExpanded={expandedIndex === idx + 1}
-            onClick={() => setExpandedIndex((prev) => (prev === idx + 1 ? -1 : idx + 1))}
+            onClick={() => setExpandedIndex(p => p === idx + 1 ? -1 : idx + 1)}
           />
         ))}
       </div>
     );
   }
 
-  // ── Desktop: flat flex row, no min-h-screen, no nested h-full chains ──────
   return (
     <div style={{ width: "100%", display: "flex", justifyContent: "center", paddingTop: "1rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
@@ -390,53 +511,7 @@ const ExpandOnHover: React.FC = () => {
   );
 };
 
-// ─── Decorative helpers ───────────────────────────────────────────────────────
-
-function FloatShape({
-  children,
-  x,
-  y,
-  delay = 0,
-  duration = 5,
-  amplitude = 10,
-  rotate = 0,
-  opacity = 0.18,
-}: FloatShapeProps): React.ReactElement {
-  return (
-    <motion.div
-      aria-hidden="true"
-      style={{
-        position: "absolute", left: x, top: y,
-        color: "#F2F0EB", opacity,
-        userSelect: "none", pointerEvents: "none",
-        fontSize: "clamp(20px, 3vw, 36px)",
-        rotate,
-      }}
-      animate={{ y: [0, -amplitude, 0], rotate: [rotate, rotate + 8, rotate] }}
-      transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function BgStar({ x, y, size = 40, opacity = 0.08, delay = 0 }: BgStarProps): React.ReactElement {
-  return (
-    <motion.div
-      aria-hidden="true"
-      style={{ position: "absolute", left: x, top: y, pointerEvents: "none", userSelect: "none", opacity }}
-      animate={{ rotate: [0, 360] }}
-      transition={{ duration: 18 + delay * 4, delay, repeat: Infinity, ease: "linear" }}
-    >
-      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 2 L21.5 18 L36 20 L21.5 22 L20 38 L18.5 22 L4 20 L18.5 18 Z" fill="#F2F0EB" />
-        <path d="M20 8 L21 18.5 L30 20 L21 21.5 L20 32 L19 21.5 L10 20 L19 18.5 Z" fill="#F2F0EB" opacity="0.5" transform="rotate(45 20 20)" />
-      </svg>
-    </motion.div>
-  );
-}
-
-/* ─── Section ────────────────────────────────────────────────────────────────── */
+// ─── Section ───────────────────────────────────────────────────────────────────
 
 export default function SkillsSection(): React.ReactElement {
   const sectionRef = useRef<HTMLElement>(null);
@@ -468,23 +543,79 @@ export default function SkillsSection(): React.ReactElement {
       ref={sectionRef}
       className="w-full bg-[#0A0A0A] px-6 sm:px-10 md:px-16 lg:px-24 py-20 sm:py-28 lg:py-36 relative overflow-x-clip"
     >
-      {/* Dot grid */}
-      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.025, backgroundImage: "radial-gradient(circle at 1px 1px, #F2F0EB 1px, transparent 0)", backgroundSize: "28px 28px" }} />
+      {/* ── Global noise overlay ──────────────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "repeat",
+          backgroundSize: "256px 256px",
+          opacity: 0.45,
+          mixBlendMode: "screen",
+          zIndex: 0,
+        }}
+      />
 
-      <BgStar x="6%" y="16%" size={52} opacity={0.1} delay={0} />
-      <BgStar x="88%" y="8%" size={38} opacity={0.08} delay={1.5} />
-      <BgStar x="78%" y="78%" size={46} opacity={0.07} delay={0.8} />
-      <BgStar x="3%" y="68%" size={30} opacity={0.07} delay={2} />
+      {/* ── Dot grid ──────────────────────────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          opacity: 0.022,
+          backgroundImage: "radial-gradient(circle at 1px 1px, #F2F0EB 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+          zIndex: 0,
+        }}
+      />
 
-      <FloatShape x="32%" y="20%" delay={0} duration={5.5} amplitude={12} opacity={0.22} rotate={0}>✳</FloatShape>
-      <FloatShape x="15%" y="82%" delay={0.6} duration={5} amplitude={10} opacity={0.16} rotate={-10}>◆</FloatShape>
-      <FloatShape x="90%" y="20%" delay={1.8} duration={7} amplitude={14} opacity={0.15} rotate={30}>✦</FloatShape>
-      <FloatShape x="70%" y="88%" delay={0.3} duration={5.8} amplitude={9} opacity={0.2} rotate={-5}>✳</FloatShape>
-      <FloatShape x="2%" y="45%" delay={0.9} duration={5.2} amplitude={8} opacity={0.18} rotate={-20}>◆</FloatShape>
-      <FloatShape x="60%" y="6%" delay={2.1} duration={7.5} amplitude={7} opacity={0.13} rotate={10}>✦</FloatShape>
+      {/* ── Radial vignette gradient ──────────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "radial-gradient(ellipse 80% 60% at 50% 50%, transparent 30%, rgba(0,0,0,0.55) 100%)",
+          zIndex: 1,
+        }}
+      />
 
-      {/* Top label row */}
-      <div className="mb-14 sm:mb-20 relative">
+      {/* ── Tech logo background ───────────────────────────────────────────── */}
+
+      {/* Far layer — large, very faint, give depth */}
+      <TechLogo logo="react"      x="42%"  y="10%"  size={96}  opacity={0.014} delay={0}   duration={50} rotateDir={1}  floatAmplitude={6}  />
+      <TechLogo logo="docker"     x="62%"  y="55%"  size={88}  opacity={0.013} delay={2.2} duration={46} rotateDir={-1} floatAmplitude={5}  />
+      <TechLogo logo="typescript" x="14%"  y="20%"  size={80}  opacity={0.016} delay={1.5} duration={42} rotateDir={1}  floatAmplitude={7}  />
+      <TechLogo logo="nextjs"     x="72%"  y="18%"  size={92}  opacity={0.013} delay={3.1} duration={54} rotateDir={-1} floatAmplitude={5}  />
+      <TechLogo logo="rust"       x="28%"  y="68%"  size={84}  opacity={0.015} delay={0.8} duration={48} rotateDir={1}  floatAmplitude={6}  />
+
+      {/* Mid layer */}
+      <TechLogo logo="react"      x="1%"   y="6%"   size={62}  opacity={0.048} delay={0}   duration={22} rotateDir={1}  floatAmplitude={11} />
+      <TechLogo logo="typescript" x="4%"   y="50%"  size={46}  opacity={0.04}  delay={1.1} duration={28} rotateDir={-1} floatAmplitude={9}  />
+      <TechLogo logo="nodejs"     x="0%"   y="74%"  size={54}  opacity={0.044} delay={0.5} duration={24} rotateDir={1}  floatAmplitude={10} />
+      <TechLogo logo="tailwind"   x="7%"   y="30%"  size={50}  opacity={0.038} delay={2.0} duration={30} rotateDir={-1} floatAmplitude={8}  />
+
+      <TechLogo logo="docker"     x="88%"  y="10%"  size={58}  opacity={0.048} delay={0.3} duration={26} rotateDir={-1} floatAmplitude={11} />
+      <TechLogo logo="git"        x="91%"  y="46%"  size={48}  opacity={0.04}  delay={1.6} duration={20} rotateDir={1}  floatAmplitude={9}  />
+      <TechLogo logo="vercel"     x="85%"  y="69%"  size={44}  opacity={0.044} delay={0.8} duration={32} rotateDir={-1} floatAmplitude={10} />
+      <TechLogo logo="postgresql" x="90%"  y="82%"  size={56}  opacity={0.038} delay={2.4} duration={25} rotateDir={1}  floatAmplitude={8}  />
+
+      {/* Top centre scatter */}
+      <TechLogo logo="figma"      x="37%"  y="2%"   size={42}  opacity={0.042} delay={1.0} duration={28} rotateDir={1}  floatAmplitude={9}  />
+      <TechLogo logo="nextjs"     x="54%"  y="5%"   size={52}  opacity={0.045} delay={0.2} duration={22} rotateDir={-1} floatAmplitude={11} />
+
+      {/* Bottom scatter */}
+      <TechLogo logo="threejs"    x="22%"  y="87%"  size={50}  opacity={0.042} delay={1.4} duration={26} rotateDir={1}  floatAmplitude={9}  />
+      <TechLogo logo="rust"       x="63%"  y="90%"  size={46}  opacity={0.038} delay={0.7} duration={30} rotateDir={-1} floatAmplitude={8}  />
+      <TechLogo logo="tailwind"   x="48%"  y="85%"  size={40}  opacity={0.036} delay={1.9} duration={24} rotateDir={1}  floatAmplitude={7}  />
+
+      {/* Extra mid-edge fillers */}
+      <TechLogo logo="git"        x="17%"  y="52%"  size={38}  opacity={0.034} delay={2.7} duration={34} rotateDir={1}  floatAmplitude={7}  />
+      <TechLogo logo="figma"      x="77%"  y="56%"  size={40}  opacity={0.034} delay={1.3} duration={29} rotateDir={-1} floatAmplitude={8}  />
+      <TechLogo logo="vercel"     x="32%"  y="4%"   size={36}  opacity={0.032} delay={3.5} duration={36} rotateDir={1}  floatAmplitude={6}  />
+      <TechLogo logo="postgresql" x="55%"  y="78%"  size={44}  opacity={0.036} delay={0.4} duration={27} rotateDir={-1} floatAmplitude={9}  />
+
+      {/* ── Top label row ──────────────────────────────────────────────────── */}
+      <div className="mb-14 sm:mb-20 relative" style={{ zIndex: 2 }}>
         <div className="flex items-center gap-5">
           <span
             className="text-[10px] sm:text-xs tracking-[0.3em] text-white/30 uppercase font-medium"
@@ -496,9 +627,8 @@ export default function SkillsSection(): React.ReactElement {
         </div>
       </div>
 
-      {/* Main grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.7fr] gap-16 lg:gap-24 items-start relative">
-        {/* LEFT */}
+      {/* ── Main grid ─────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.7fr] gap-16 lg:gap-24 items-start relative" style={{ zIndex: 2 }}>
         <div className="left-content lg:sticky lg:top-24">
           <h2
             className="text-[#F2F0EB] text-5xl sm:text-5xl lg:text-6xl xl:text-6xl font-black tracking-tighter leading-[0.88] mb-8 sm:mb-10"
@@ -509,12 +639,14 @@ export default function SkillsSection(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Cards row — centred across full section width ── */}
-      <div className="mt-10 flex justify-center" ref={rightRef}>
+      {/* ── Cards row ─────────────────────────────────────────────────────── */}
+      <div className="mt-10 flex justify-center relative" ref={rightRef} style={{ zIndex: 2 }}>
         <ExpandOnHover />
       </div>
 
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+      `}</style>
     </section>
   );
 }

@@ -40,6 +40,105 @@ function FontLoader() {
   );
 }
 
+// ─── Cinematic BG ─────────────────────────────────────────────────────────────
+
+/** A single god-ray: tall narrow cone rotated from the top */
+function GodRay({ left, rotate, opacity, duration, delay }: {
+  left: string; rotate: number; opacity: number; duration: number; delay: number;
+}) {
+  return (
+    <motion.div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        top: '-10%',
+        left,
+        width: 'clamp(120px, 18vw, 260px)',
+        height: '130%',
+        transformOrigin: 'top center',
+        rotate,
+        background: `linear-gradient(180deg,
+          rgba(232,230,225,${opacity}) 0%,
+          rgba(210,211,212,${opacity * 0.5}) 30%,
+          transparent 75%)`,
+        filter: 'blur(clamp(28px, 5vw, 48px))',
+        pointerEvents: 'none',
+      }}
+      animate={{ opacity: [opacity, opacity * 0.45, opacity * 0.8, opacity] }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
+    />
+  );
+}
+
+/** Slow drifting fog layer */
+function FogLayer({ top, opacity, duration, delay, scaleX = 1 }: {
+  top: string; opacity: number; duration: number; delay: number; scaleX?: number;
+}) {
+  return (
+    <motion.div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        top,
+        left: '-20%',
+        width: '140%',
+        height: 'clamp(180px, 35vh, 320px)',
+        scaleX,
+        background: `radial-gradient(ellipse 70% 50% at 50% 50%,
+          rgba(200,198,193,${opacity}) 0%,
+          rgba(166,164,162,${opacity * 0.4}) 45%,
+          transparent 70%)`,
+        filter: 'blur(clamp(40px, 8vw, 80px))',
+        pointerEvents: 'none',
+      }}
+      animate={{
+        x:       [0, 30, -20, 0],
+        opacity: [opacity, opacity * 0.6, opacity * 0.9, opacity],
+      }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
+    />
+  );
+}
+
+/** Deep vignette around the edges */
+function Vignette() {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: `radial-gradient(ellipse 85% 75% at 50% 50%,
+          transparent 30%,
+          rgba(0,0,0,0.55) 70%,
+          rgba(0,0,0,0.88) 100%)`,
+      }}
+    />
+  );
+}
+
+/** Tiny floating dust motes */
+function DustMote({ x, y, duration, delay }: { x: string; y: string; duration: number; delay: number }) {
+  return (
+    <motion.div
+      aria-hidden="true"
+      style={{
+        position: 'absolute', left: x, top: y,
+        width: 2, height: 2, borderRadius: '50%',
+        background: T.platinum,
+        pointerEvents: 'none',
+      }}
+      animate={{
+        y:       [0, -40, -80, -120],
+        x:       [0, 8, -5, 10],
+        opacity: [0, 0.35, 0.2, 0],
+      }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'easeOut' }}
+    />
+  );
+}
+
+// ─── Card (100% original) ────────────────────────────────────────────────────
+
 function FloatShape({ children, x, y, delay = 0, duration = 5, amplitude = 10, rotate = 0, opacity = 0.18 }: {
   children: React.ReactNode; x: string; y: string;
   delay?: number; duration?: number; amplitude?: number; rotate?: number; opacity?: number;
@@ -103,16 +202,6 @@ function MetallicBorderRing() {
   );
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
-//
-// BG transition fix: instead of animating between a gradient string and a hex
-// color (which framer-motion cannot interpolate), we stack two divs:
-//   • bottom: silver gradient — always present, full opacity
-//   • top:    solid black — fades from opacity 0 → 1 on hover
-// That way the transition is a simple opacity cross-fade, which is perfectly smooth.
-//
-// Reveal region: increased mask radius to 160px with a longer soft falloff.
-//
 function TiltCard() {
   const cardRef = useRef<HTMLDivElement>(null);
   const rawX    = useMotionValue(0);
@@ -125,7 +214,6 @@ function TiltCard() {
   const cursorX    = useSpring(rawCursorX, { stiffness: 400, damping: 35 });
   const cursorY    = useSpring(rawCursorY, { stiffness: 400, damping: 35 });
 
-  // Mask: solid centre at cursor fading out at 160px
   const maskImage = useTransform(
     [cursorX, cursorY] as const,
     ([x, y]: number[]) =>
@@ -169,48 +257,24 @@ function TiltCard() {
       transition={{ scale: { type: 'spring', stiffness: 280, damping: 30 } }}
     >
       <MetallicBorderRing />
-
-      {/* Outer clip container */}
       <div style={{ borderRadius: 20, position: 'relative', overflow: 'hidden', border: `1px solid ${T.borderFaint}` }}>
-
-        {/* ── BG Layer 1: silver gradient — always underneath ── */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(150deg, #a6a4a2 0%, #d1d0cf 55%, #323233 100%)',
-          borderRadius: 20,
-        }} />
-
-        {/* ── BG Layer 2: black — fades in on hover, simple opacity transition ── */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: '#0a0a0a',
-          borderRadius: 20,
-          opacity: hovered ? 1 : 0,
-          transition: 'opacity 0.4s ease',
-        }} />
-
-        {/* Card content wrapper (sits above both bg layers) */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(150deg, #a6a4a2 0%, #d1d0cf 55%, #323233 100%)', borderRadius: 20 }} />
+        <div style={{ position: 'absolute', inset: 0, background: '#0a0a0a', borderRadius: 20, opacity: hovered ? 1 : 0, transition: 'opacity 0.4s ease' }} />
         <div style={{ position: 'relative', padding: pad }}>
           <CornerAccent position="tl" />
           <CornerAccent position="tr" />
           <CornerAccent position="bl" />
           <CornerAccent position="br" />
-
-          {/* ── LAYER A: ghost — two sub-layers cross-fade for smooth color transition ── */}
-          {/* Sub A1: original dark ink, visible on silver bg, fades OUT on hover  */}
           <div style={{ position: 'relative', zIndex: 2, opacity: hovered ? 0 : 1, transition: 'opacity 0.7s ease' }}>
             <div className="about-card-body">
               <EditorialAboutText inkColor="#0A0A0A" bodyOpacity={0.85} />
             </div>
           </div>
-          {/* Sub A2: dim gray ink, barely visible on black bg, fades IN on hover */}
           <div style={{ position: 'absolute', top: pad, left: pad, right: pad, bottom: pad, zIndex: 3, opacity: hovered ? 1 : 0, transition: 'opacity 0.7s ease', pointerEvents: 'none' }}>
             <div className="about-card-body">
               <EditorialAboutText inkColor="#3a3a3a" bodyOpacity={1} />
             </div>
           </div>
-
-          {/* ── LAYER B: white text, masked to cursor region ── */}
           <motion.div
             style={{
               position: 'absolute',
@@ -234,6 +298,7 @@ function TiltCard() {
   );
 }
 
+// ─── Main export ──────────────────────────────────────────────────────────────
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null!);
 
@@ -241,12 +306,49 @@ export default function About() {
     <section
       id="about-section"
       ref={sectionRef}
-      style={{ position: 'relative', width: '100%', minHeight: '100svh', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'clip', overflowY: 'visible' }}
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100svh',
+        background: '#0A0A0A',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflowX: 'clip',
+        overflowY: 'visible',
+      }}
     >
       <FontLoader />
 
+      {/* ── Dot grid texture (very faint, same as before) ── */}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.022, backgroundImage: `radial-gradient(circle at 1px 1px, ${T.silver} 1px, transparent 0)`, backgroundSize: '28px 28px' }} />
 
+      {/* ── God rays ── */}
+      <GodRay left="18%"  rotate={-18} opacity={0.055} duration={12} delay={0}   />
+      <GodRay left="48%"  rotate={4}   opacity={0.07}  duration={16} delay={2}   />
+      <GodRay left="72%"  rotate={22}  opacity={0.045} duration={14} delay={4.5} />
+      <GodRay left="5%"   rotate={-30} opacity={0.03}  duration={18} delay={1.5} />
+      <GodRay left="88%"  rotate={35}  opacity={0.03}  duration={20} delay={6}   />
+
+      {/* ── Fog layers ── */}
+      <FogLayer top="5%"   opacity={0.07} duration={20} delay={0}   />
+      <FogLayer top="38%"  opacity={0.05} duration={25} delay={5}   scaleX={-1} />
+      <FogLayer top="72%"  opacity={0.06} duration={22} delay={2.5} />
+
+      {/* ── Vignette ── */}
+      <Vignette />
+
+      {/* ── Dust motes (mobile: fewer, all hidden via pointer-events none already) ── */}
+      {[
+        { x: '22%', y: '80%', duration: 14, delay: 0   },
+        { x: '45%', y: '90%', duration: 18, delay: 3   },
+        { x: '61%', y: '75%', duration: 12, delay: 6   },
+        { x: '78%', y: '85%', duration: 16, delay: 1.5 },
+        { x: '33%', y: '70%', duration: 20, delay: 8   },
+        { x: '55%', y: '88%', duration: 15, delay: 4   },
+      ].map((m, i) => <DustMote key={i} {...m} />)}
+
+      {/* ── Original decorative elements (kept exactly) ── */}
       <BgStar x="28%" y="4%"  size={52} opacity={0.5}  delay={0}   />
       <BgStar x="82%" y="16%" size={38} opacity={0.6}  delay={0.8} />
       <BgCircle x="10%" y="70%" size={70} opacity={0.18} delay={1} />
@@ -259,12 +361,25 @@ export default function About() {
       <FloatShape x="60%" y="5%"  delay={2.1} duration={7.5} amplitude={7}  opacity={0.18} rotate={10}>✦</FloatShape>
       <FloatShape x="35%" y="88%" delay={1.2} duration={6.5} amplitude={11} opacity={0.18} rotate={20}>✚</FloatShape>
 
-      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '1200px', margin: '0 auto', padding: 'clamp(3rem, 8vw, 7rem) clamp(1rem, 5vw, 4rem)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
+      {/* ── Content ── */}
+      <div style={{
+        position: 'relative', zIndex: 10,
+        width: '100%', maxWidth: '1200px',
+        margin: '0 auto',
+        padding: 'clamp(3rem, 8vw, 7rem) clamp(1rem, 5vw, 4rem)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+      }}>
         <motion.div
           initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          style={{ color: T.mist, fontSize: 'clamp(0.58rem, 1.1vw, 0.68rem)', fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif", letterSpacing: '0.24em', textTransform: 'uppercase', marginBottom: 'clamp(1.25rem, 3vw, 2.25rem)', display: 'flex', alignItems: 'center', gap: '12px' }}
+          style={{
+            color: T.mist,
+            fontSize: 'clamp(0.58rem, 1.1vw, 0.68rem)',
+            fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif",
+            letterSpacing: '0.24em', textTransform: 'uppercase',
+            marginBottom: 'clamp(1.25rem, 3vw, 2.25rem)',
+            display: 'flex', alignItems: 'center', gap: '12px',
+          }}
         >
           <span style={{ width: 22, height: '1px', background: T.mist, opacity: 0.38, display: 'inline-block' }} />
           About
@@ -282,7 +397,13 @@ export default function About() {
         <motion.div
           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.55 }}
-          style={{ marginTop: 'clamp(2rem, 5vw, 3.5rem)', display: 'flex', alignItems: 'center', gap: '8px', color: T.mist, opacity: 0.3, fontFamily: "'DM Sans', sans-serif", fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase' }}
+          style={{
+            marginTop: 'clamp(2rem, 5vw, 3.5rem)',
+            display: 'flex', alignItems: 'center', gap: '8px',
+            color: T.mist, opacity: 0.3,
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase',
+          }}
         >
           <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}>↓</motion.span>
           scroll
