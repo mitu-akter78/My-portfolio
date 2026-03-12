@@ -9,7 +9,7 @@ const Hero = () => {
     return (
         <section
             ref={containerRef}
-            className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A] border-b-1 border-[#2F3030]"
+            className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0a0a0a] border-b-1 border-[#2F3030]"
             id="home"
         >
             <div className="absolute inset-0 z-0">
@@ -30,7 +30,7 @@ const Hero = () => {
 
             <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-full">
                 {/* Name */}
-                <h1 className="leading-none select-none flex flex-wrap justify-center text-[#F3F1EC] transition-all duration-300 ease-out hover:drop-shadow-[#AA3E56]">
+                <h1 className="leading-none select-none flex flex-wrap justify-center text-[#F3F1EC] transition-all duration-300 ease-out hover:drop-shadow-[#d4d4d4]">
                     <VariableProximity
                         label="SADIA AKTER"
                         className="font-black"
@@ -50,7 +50,7 @@ const Hero = () => {
                 </h1>
 
                 {/* Subtitle + CTA */}
-                <div className="mt-0.4 flex flex-col items-center gap-[5px]">
+                <div className="mt-0.4 flex flex-col items-center gap-[4px]">
                     <div className="w-full h-[2px] bg-[#F3F1EC] " />
 
                     <VariableProximity
@@ -63,7 +63,7 @@ const Hero = () => {
                         falloff="linear"
                         style={{
                             color: '#F3F1EC',
-                            fontSize: 'clamp(0.45rem, 1.3vw, 1.3rem)',
+                            fontSize: 'clamp(0.7rem, 1.5vw, 1.5rem)',
                             letterSpacing: '0.1em',
                             fontFamily: "'Playfair Display', Georgia, serif",
                             textTransform: 'uppercase',
@@ -82,7 +82,7 @@ const Hero = () => {
                         onClick={() => document.getElementById('projects-section')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                         <span className="whitespace-pre-wrap text-center text-base font-medium leading-none tracking-tight text-[#fcf5f6] dark:from-white dark:to-slate-900/10 lg:text-lg">
-                            View work
+                            View My Work
                         </span>
                     </ShimmerButton>
                 </div>

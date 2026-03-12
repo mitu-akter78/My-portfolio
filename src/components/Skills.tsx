@@ -41,11 +41,9 @@ interface TechLogoProps {
   x: string;
   y: string;
   size?: number;
-  opacity?: number;
-  delay?: number;
-  duration?: number;
-  rotateDir?: 1 | -1;
-  floatAmplitude?: number;
+  peakOpacity?: number;   // max opacity at peak of pulse
+  delay?: number;          // stagger delay so logos pop at different times
+  cycleDuration?: number;  // full loop length in seconds
   logo: LogoKey;
 }
 
@@ -164,34 +162,48 @@ const logoSVGs: Record<LogoKey, (size: number) => React.ReactElement> = {
 };
 
 // ─── TechLogo ──────────────────────────────────────────────────────────────────
+// Pulse / pop animation: each logo blooms in from blur+scale, holds, dissolves.
+// cycleDuration = total loop length. The visible window is ~30% of that,
+// so at any moment only a handful of logos are lit — feels like constellations
+// flickering on and off.
 
 const TechLogo: React.FC<TechLogoProps> = ({
-  x, y, size = 48, opacity = 0.055, delay = 0,
-  duration = 22, rotateDir = 1, floatAmplitude = 10, logo,
-}) => (
-  <motion.div
-    aria-hidden="true"
-    style={{
-      position: "absolute",
-      left: x,
-      top: y,
-      pointerEvents: "none",
-      userSelect: "none",
-      color: "#F2F0EB",
-      opacity,
-    }}
-    animate={{
-      rotate: [0, 360 * rotateDir],
-      y: [0, -floatAmplitude, 0],
-    }}
-    transition={{
-      rotate: { duration, delay, repeat: Infinity, ease: "linear" },
-      y: { duration: duration * 0.28, delay, repeat: Infinity, ease: "easeInOut" },
-    }}
-  >
-    {logoSVGs[logo](size)}
-  </motion.div>
-);
+  x, y, size = 48, peakOpacity = 0.055, delay = 0,
+  cycleDuration = 12, logo,
+}) => {
+  // keyframe proportions: 0 → in at 12% → peak at 18% → hold to 40% → out at 55% → dark rest
+  const times = [0, 0.12, 0.18, 0.40, 0.55, 1];
+
+  return (
+    <motion.div
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        pointerEvents: "none",
+        userSelect: "none",
+        color: "#F2F0EB",
+        originX: "50%",
+        originY: "50%",
+      }}
+      animate={{
+        opacity: [0,              peakOpacity * 0.4, peakOpacity,   peakOpacity,   0,             0            ],
+        scale:   [0.65,           1.08,              1.0,           0.96,          0.7,            0.65         ],
+        filter:  ["blur(4px)",    "blur(1px)",       "blur(0px)",   "blur(0.5px)", "blur(3.5px)",  "blur(4px)"  ],
+      }}
+      transition={{
+        duration: cycleDuration,
+        delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+        times,
+      }}
+    >
+      {logoSVGs[logo](size)}
+    </motion.div>
+  );
+};
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
@@ -352,7 +364,7 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
       style={{
         width,
         height: "29rem",
-        background: "#080808",
+        background: "#040404",
         borderRadius: "1.5rem",
         flexShrink: 0,
         transition: "width 0.5s cubic-bezier(0.4,0,0.2,1)",
@@ -365,7 +377,7 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
       onMouseEnter={() => { setIsHovered(true); setSpotlight(s => ({ ...s, opacity: 1 })); onMouseEnter(); }}
       onMouseLeave={() => { setIsHovered(false); setSpotlight(s => ({ ...s, opacity: 0 })); }}
     >
-      <div style={{ position: "absolute", inset: 0, background: stack.gradient, opacity: 0.8, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", inset: 0, background: stack.gradient, opacity: 0.6, pointerEvents: "none" }} />
       <div style={{ position: "absolute", inset: 0, background: stack.accentGradient, opacity: 0.6, pointerEvents: "none" }} />
       {/* Noise layer */}
       <div style={{
@@ -379,7 +391,7 @@ const DesktopCard: React.FC<DesktopCardProps> = ({ stack, isExpanded, onMouseEnt
       {/* Spotlight */}
       <div style={{
         position: "absolute", inset: 0,
-        background: `radial-gradient(circle 160px at ${spotlight.x}% ${spotlight.y}%, rgba(255,255,255,0.07) 0%, transparent 80%)`,
+        background: `radial-gradient(circle 160px at ${spotlight.x}% ${spotlight.y}%, rgba(255,255,255,0.05) 0%, transparent 80%)`,
         opacity: spotlight.opacity, transition: "opacity 0.3s ease", pointerEvents: "none",
       }} />
       {/* Sheen */}
@@ -579,40 +591,40 @@ export default function SkillsSection(): React.ReactElement {
         }}
       />
 
-      {/* ── Tech logo background ───────────────────────────────────────────── */}
+      {/* ── Tech logo background — pulse / pop constellation ──────────────── */}
+      {/* Each logo has its own cycle length + delay so they feel truly random. */}
+      {/* Far layer — large, very faint ghost logos for depth */}
+      <TechLogo logo="react"      x="42%"  y="10%"  size={76}  peakOpacity={0.030} delay={0}    cycleDuration={18} />
+      <TechLogo logo="docker"     x="62%"  y="55%"  size={88}  peakOpacity={0.028} delay={5.3}  cycleDuration={22} />
+      <TechLogo logo="typescript" x="24%"  y="20%"  size={60}  peakOpacity={0.032} delay={3}  cycleDuration={16} />
+      <TechLogo logo="nextjs"     x="72%"  y="18%"  size={92}  peakOpacity={0.026} delay={4.0} cycleDuration={20} />
+      <TechLogo logo="rust"       x="28%"  y="68%"  size={84}  peakOpacity={0.030} delay={5.8}  cycleDuration={19} />
 
-      {/* Far layer — large, very faint, give depth */}
-      <TechLogo logo="react"      x="42%"  y="10%"  size={96}  opacity={0.014} delay={0}   duration={50} rotateDir={1}  floatAmplitude={6}  />
-      <TechLogo logo="docker"     x="62%"  y="55%"  size={88}  opacity={0.013} delay={2.2} duration={46} rotateDir={-1} floatAmplitude={5}  />
-      <TechLogo logo="typescript" x="14%"  y="20%"  size={80}  opacity={0.016} delay={1.5} duration={42} rotateDir={1}  floatAmplitude={7}  />
-      <TechLogo logo="nextjs"     x="72%"  y="18%"  size={92}  opacity={0.013} delay={3.1} duration={54} rotateDir={-1} floatAmplitude={5}  />
-      <TechLogo logo="rust"       x="28%"  y="68%"  size={84}  opacity={0.015} delay={0.8} duration={48} rotateDir={1}  floatAmplitude={6}  />
+      {/* Mid layer — primary visible logos */}
+      <TechLogo logo="react"      x="80%"   y="36%"   size={62}  peakOpacity={0.10}  delay={0}    cycleDuration={11} />
+      <TechLogo logo="typescript" x="4%"   y="50%"  size={46}  peakOpacity={0.085} delay={4.2}  cycleDuration={14} />
+      <TechLogo logo="nodejs"     x="10%"   y="74%"  size={84}  peakOpacity={0.09}  delay={1}  cycleDuration={12} />
+      <TechLogo logo="tailwind"   x="7%"   y="30%"  size={50}  peakOpacity={0.08}  delay={1.7}  cycleDuration={15} />
 
-      {/* Mid layer */}
-      <TechLogo logo="react"      x="1%"   y="6%"   size={62}  opacity={0.048} delay={0}   duration={22} rotateDir={1}  floatAmplitude={11} />
-      <TechLogo logo="typescript" x="4%"   y="50%"  size={46}  opacity={0.04}  delay={1.1} duration={28} rotateDir={-1} floatAmplitude={9}  />
-      <TechLogo logo="nodejs"     x="0%"   y="74%"  size={54}  opacity={0.044} delay={0.5} duration={24} rotateDir={1}  floatAmplitude={10} />
-      <TechLogo logo="tailwind"   x="7%"   y="30%"  size={50}  opacity={0.038} delay={2.0} duration={30} rotateDir={-1} floatAmplitude={8}  />
-
-      <TechLogo logo="docker"     x="88%"  y="10%"  size={58}  opacity={0.048} delay={0.3} duration={26} rotateDir={-1} floatAmplitude={11} />
-      <TechLogo logo="git"        x="91%"  y="46%"  size={48}  opacity={0.04}  delay={1.6} duration={20} rotateDir={1}  floatAmplitude={9}  />
-      <TechLogo logo="vercel"     x="85%"  y="69%"  size={44}  opacity={0.044} delay={0.8} duration={32} rotateDir={-1} floatAmplitude={10} />
-      <TechLogo logo="postgresql" x="90%"  y="82%"  size={56}  opacity={0.038} delay={2.4} duration={25} rotateDir={1}  floatAmplitude={8}  />
+      <TechLogo logo="docker"     x="88%"  y="10%"  size={58}  peakOpacity={0.10}  delay={2.6}  cycleDuration={10} />
+      <TechLogo logo="git"        x="91%"  y="46%"  size={48}  peakOpacity={0.085} delay={6.0}  cycleDuration={13} />
+      <TechLogo logo="vercel"     x="85%"  y="69%"  size={44}  peakOpacity={0.09}  delay={5.4}  cycleDuration={11} />
+      <TechLogo logo="postgresql" x="90%"  y="82%"  size={56}  peakOpacity={0.08}  delay={0.9}  cycleDuration={16} />
 
       {/* Top centre scatter */}
-      <TechLogo logo="figma"      x="37%"  y="2%"   size={42}  opacity={0.042} delay={1.0} duration={28} rotateDir={1}  floatAmplitude={9}  />
-      <TechLogo logo="nextjs"     x="54%"  y="5%"   size={52}  opacity={0.045} delay={0.2} duration={22} rotateDir={-1} floatAmplitude={11} />
+      <TechLogo logo="figma"      x="37%"  y="30%"   size={52}  peakOpacity={0.088} delay={0} cycleDuration={12} />
+      <TechLogo logo="nextjs"     x="54%"  y="5%"   size={52}  peakOpacity={0.095} delay={3.0}  cycleDuration={10} />
 
       {/* Bottom scatter */}
-      <TechLogo logo="threejs"    x="22%"  y="87%"  size={50}  opacity={0.042} delay={1.4} duration={26} rotateDir={1}  floatAmplitude={9}  />
-      <TechLogo logo="rust"       x="63%"  y="90%"  size={46}  opacity={0.038} delay={0.7} duration={30} rotateDir={-1} floatAmplitude={8}  />
-      <TechLogo logo="tailwind"   x="48%"  y="85%"  size={40}  opacity={0.036} delay={1.9} duration={24} rotateDir={1}  floatAmplitude={7}  />
+      <TechLogo logo="threejs"    x="22%"  y="87%"  size={50}  peakOpacity={0.088} delay={5.1}  cycleDuration={13} />
+      <TechLogo logo="rust"       x="63%"  y="90%"  size={46}  peakOpacity={0.08}  delay={6.2} cycleDuration={11} />
+      <TechLogo logo="tailwind"   x="48%"  y="85%"  size={40}  peakOpacity={0.075} delay={7.8}  cycleDuration={14} />
 
-      {/* Extra mid-edge fillers */}
-      <TechLogo logo="git"        x="17%"  y="52%"  size={38}  opacity={0.034} delay={2.7} duration={34} rotateDir={1}  floatAmplitude={7}  />
-      <TechLogo logo="figma"      x="77%"  y="56%"  size={40}  opacity={0.034} delay={1.3} duration={29} rotateDir={-1} floatAmplitude={8}  />
-      <TechLogo logo="vercel"     x="32%"  y="4%"   size={36}  opacity={0.032} delay={3.5} duration={36} rotateDir={1}  floatAmplitude={6}  />
-      <TechLogo logo="postgresql" x="55%"  y="78%"  size={44}  opacity={0.036} delay={0.4} duration={27} rotateDir={-1} floatAmplitude={9}  />
+      {/* Mid-edge fillers */}
+      <TechLogo logo="git"        x="17%"  y="52%"  size={38}  peakOpacity={0.075} delay={6.3} cycleDuration={15} />
+      <TechLogo logo="figma"      x="77%"  y="56%"  size={40}  peakOpacity={0.08}  delay={2.1}  cycleDuration={12} />
+      <TechLogo logo="vercel"     x="32%"  y="4%"   size={36}  peakOpacity={0.07}  delay={7.0} cycleDuration={16} />
+      <TechLogo logo="postgresql" x="55%"  y="78%"  size={44}  peakOpacity={0.082} delay={6.6}  cycleDuration={11} />
 
       {/* ── Top label row ──────────────────────────────────────────────────── */}
       <div className="mb-14 sm:mb-20 relative" style={{ zIndex: 2 }}>
